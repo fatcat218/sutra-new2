@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sutra — Know your buyer. Own your market.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<canvas id="ring-grid" aria-hidden="true"></canvas>
+
+<!-- ===== NAV ===== -->
+<nav>
+  <div class="wrap inner">
+    <a class="logo" href="index.html"><span>Sutra</span><span class="dot"></span></a>
+    <div class="nav-links">
+      <a href="how-it-works.html">How it works</a>
+      <a href="index.html#features">Platform</a>
+      <a href="index.html#industries">Industries</a>
+      <a href="about.html">About</a>
+    </div>
+    <a class="btn" href="waitlist.html">Join waitlist <span class="arrow">→</span></a>
+  </div>
+</nav>
+
+<!-- ===== HERO (centered) ===== -->
+<section class="hero">
+  <div class="wrap">
+    <div class="kicker hero-animate hero-animate-1">
+      <span class="pill">Private pilot · Limited access</span>
+      <span>The AI growth platform · Built for Bharat</span>
+    </div>
+
+    <h1 class="headline">
+      <span class="word" style="animation-delay:0.10s"><span class="it">Know</span></span>
+      <span class="word" style="animation-delay:0.22s">your</span>
+      <span class="word" style="animation-delay:0.34s"><span class="accent-stroke">buyer.</span></span><br/>
+      <span class="word" style="animation-delay:0.54s"><span class="it">Own</span></span>
+      <span class="word" style="animation-delay:0.66s">your</span>
+      <span class="word" style="animation-delay:0.78s">market.</span>
+    </h1>
+
+    <p class="hero-sub hero-animate hero-animate-3">
+      Sutra is the AI marketing platform built for Indian brands and startups.
+      <b>Understand your audience, generate high-converting video campaigns, and launch across Meta and Google</b>
+      — without the agency bill or the tool sprawl.
+    </p>
+
+    <div class="cta-row hero-animate hero-animate-4">
+      <a class="btn" href="waitlist.html">Start free <span class="arrow">→</span></a>
+      <a class="btn ghost" href="#how">See how it works</a>
+    </div>
+    <p class="cta-nocard hero-animate hero-animate-4">No credit card required</p>
+  </div>
+</section>
+
+<!-- ===== ANIMATED DEMO ===== -->
+<section class="demo-wrap">
+  <div class="wrap">
+    <div class="demo">
+      <div class="demo-toolbar">
+        <span class="tdot"></span><span class="tdot"></span><span class="tdot"></span>
+        <span class="url">sutra.ai / workspace</span>
+        <span class="live">● Live demo</span>
+      </div>
+
+      <div class="demo-stage">
+        <!-- Scene 1 — Research -->
+        <div class="scene scene-1">
+          <div class="s-research">
+            <div class="left">
+              <div class="label">01 · Consumer Research</div>
+              <h4>Tier-2 women 24-32 in <span class="acc">apparel</span>.</h4>
+              <div class="seg"><span class="val">78%</span><span class="lab">Trust > Discount</span><div class="bar"></div></div>
+              <div class="seg"><span class="val">54%</span><span class="lab">EMI clarity matters</span><div class="bar"></div></div>
+              <div class="seg"><span class="val">91%</span><span class="lab">Regional creator preference</span><div class="bar"></div></div>
+            </div>
+            <div class="right">
+              <div class="radar">
+                <div class="sweep"></div>
+                <div class="radar-center"></div>
+                <div class="radar-dot rd1"></div>
+                <div class="radar-dot rd2"></div>
+                <div class="radar-dot rd3"></div>
+                <div class="radar-dot rd4"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scene 2 — Create -->
+        <div class="scene scene-2">
+          <div class="s-create">
+            <div>
+              <div class="label">02 · AI Ad-storm</div>
+              <h4>Generating <span class="acc">14s reel</span> for Meta.</h4>
+              <div class="script-area">
+                <div class="line"><span class="dim">// 0:00 - 0:02</span></div>
+                <div class="line"><span class="cyan">HOOK</span> Close-up: artisan stitching, shot golden hour</div>
+                <div class="line"><span class="dim">// 0:02 - 0:06</span></div>
+                <div class="line"><span class="cyan">REVEAL</span> Model in finished kurta walking through bazaar</div>
+                <div class="line"><span class="dim">// 0:06 - 0:14</span></div>
+                <div class="line"><span class="cyan">CTA</span> "Stitched in Surat. Worn everywhere." <span class="cursor"></span></div>
+              </div>
+            </div>
+            <div class="ad-mock">
+              <span class="tag">Generated v3 · 14s reel</span>
+              <div>
+                <div class="ad-h">"Stitched in Surat. Worn everywhere."</div>
+                <div class="ad-meta">META + REELS · 9:16 · CTR-OPTIMIZED</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scene 3 — Launch -->
+        <div class="scene scene-3">
+          <div class="s-launch">
+            <div class="label">03 · One-click Launch</div>
+            <h4>Live across <span class="acc">4 platforms</span> in 90 seconds.</h4>
+            <div class="launch-grid">
+              <div class="conn conn-1"></div><div class="conn conn-2"></div>
+              <div class="conn conn-3"></div><div class="conn conn-4"></div>
+              <div class="launch-center">S</div>
+              <div class="platform-chip pc-1 live">Meta Ads</div>
+              <div class="platform-chip pc-2 live">Google</div>
+              <div class="platform-chip pc-3 live">Instagram Reels</div>
+              <div class="platform-chip pc-4 live">YouTube</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scene 4 — Optimize -->
+        <div class="scene scene-4">
+          <div class="s-opt">
+            <div>
+              <div class="label">04 · Day 7 Performance</div>
+              <h4>AI shifts spend to what's <span class="acc">actually working</span>.</h4>
+              <div class="chart-area">
+                <svg viewBox="0 0 400 220" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="cf" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stop-color="#8A4F55" stop-opacity="0.6"/>
+                      <stop offset="100%" stop-color="#8A4F55" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <line x1="0" y1="180" x2="400" y2="180" stroke="rgba(234,226,216,0.15)"/>
+                  <line x1="0" y1="120" x2="400" y2="120" stroke="rgba(234,226,216,0.08)" stroke-dasharray="2 4"/>
+                  <line x1="0" y1="60"  x2="400" y2="60"  stroke="rgba(234,226,216,0.08)" stroke-dasharray="2 4"/>
+                  <path d="M0,160 C50,150 90,155 130,130 C170,108 200,90 240,68 C280,50 320,40 400,20 L400,220 L0,220 Z" fill="url(#cf)"/>
+                  <path d="M0,160 C50,150 90,155 130,130 C170,108 200,90 240,68 C280,50 320,40 400,20" fill="none" stroke="#C28E94" stroke-width="2"/>
+                  <circle cx="400" cy="20" r="5" fill="#C28E94"/>
+                  <circle cx="400" cy="20" r="11" fill="#C28E94" fill-opacity="0.25"/>
+                </svg>
+              </div>
+            </div>
+            <div class="metrics-stack">
+              <div class="met-card">
+                <div class="ml">CPA</div>
+                <div class="mv">₹47<span class="delta">↓ 62%</span></div>
+              </div>
+              <div class="met-card">
+                <div class="ml">ROAS</div>
+                <div class="mv">4.2x<span class="delta">↑ 280%</span></div>
+              </div>
+              <div class="met-card">
+                <div class="ml">CTR</div>
+                <div class="mv">5.8%<span class="delta">↑ 312%</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-progress">
+        <div class="step dp-1">01 — Research</div>
+        <div class="step dp-2">02 — Create</div>
+        <div class="step dp-3">03 — Launch</div>
+        <div class="step dp-4">04 — Optimize</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PROBLEM (dark, colorful cards) ===== -->
+<section class="problem">
+  <div class="wrap">
+    <div class="problem-heading">
+      <div class="section-label" style="justify-content:center;">The reality check</div>
+      <h2>Marketing is <em>broken</em> for every founder<br/>who isn't already big.</h2>
+    </div>
+    <div class="problem-grid">
+
+      <div class="prob-card" data-num="01" style="--pc:#E05C5C">
+        <span class="prob-icon">✕</span>
+        <h3>6+ tools to ship<br/>one campaign</h3>
+        <p>Research, design, copy, launch, analytics — all separate. The tab count is the problem.</p>
+      </div>
+
+      <div class="prob-card" data-num="02" style="--pc:#E09A4A">
+        <span class="prob-icon">₹</span>
+        <h3>Agencies that cost<br/>more than runway</h3>
+        <p>₹2–4 lakh per month for campaigns that don't understand your market or your buyer.</p>
+      </div>
+
+      <div class="prob-card" data-num="03" style="--pc:#4EAD85">
+        <span class="prob-icon">◌</span>
+        <h3>Templates built for<br/>San Francisco</h3>
+        <p>Not Surat. Not Indore. Not the tier-2 buyer who decides on the first scroll.</p>
+      </div>
+
+      <div class="prob-card" data-num="04" style="--pc:#C28E94">
+        <span class="prob-icon">⟲</span>
+        <h3>Spreadsheets tracking<br/>what works</h3>
+        <p>Manual ROAS logging in 2025 while your competitor runs automated A/B tests.</p>
+      </div>
+
+      <div class="prob-card" data-num="05" style="--pc:#8B72D4">
+        <span class="prob-icon">⌒</span>
+        <h3>Zero behavioural insight<br/>before you spend</h3>
+        <p>Every rupee is a bet with no data behind it. You're flying blind into the auction.</p>
+      </div>
+
+      <div class="prob-card" data-num="06" style="--pc:#4A9AC4">
+        <span class="prob-icon">⏱</span>
+        <h3>Founder doing marketing<br/>at 11pm</h3>
+        <p>Your job is building the product. Marketing shouldn't eat the hours you don't have.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+
+<!-- ===== HOW IT WORKS (Accordion flow) ===== -->
+<section class="section" id="how" style="padding-top:60px;">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="section-label">01 — The workflow</div>
+        <h2 class="section-title">Five steps from a fuzzy idea to a <em>live, optimizing</em> campaign.</h2>
+      </div>
+      <div class="section-aside">
+        Five stages, one platform. Each step feeds the next with the intelligence it needs.
+      </div>
+    </div>
+
+    <div class="flow-accordion">
+      <div class="flow-panel active" data-index="0">
+        <div class="flow-panel-title-vertical">01. Research</div>
+        <div class="flow-panel-inner">
+          <div class="step-num">01</div>
+          <h3><em>Consumer</em> Research</h3>
+          <p class="flow-desc">AI-powered audience analysis to understand your ideal customer.</p>
+          <ul class="sub-list">
+            <li><b>Demographic</b>Age, gender, income, location</li>
+            <li><b>Socio-economic</b>Lifestyle, employment, class</li>
+            <li><b>Behavioural</b>Purchase, cultural, regional</li>
+          </ul>
+          <div class="output-tag">
+            <span class="out-label">Output</span>
+            <span class="out-val">Target audience profile</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Panel 2 -->
+      <div class="flow-panel" data-index="1">
+        <div class="flow-panel-title-vertical">02. Design</div>
+        <div class="flow-panel-inner">
+          <div class="step-num">02</div>
+          <h3><em>Designing</em> Ads</h3>
+          <p class="flow-desc">High-converting creative across formats — with AI or manually.</p>
+          <ul class="sub-list">
+            <li><b>Ad strategy</b>AI angle &amp; hook suggestions</li>
+            <li><b>Script &amp; copy</b>Second-by-second direction</li>
+            <li><b>Visuals &amp; video</b>Realistic actor reels, VOs</li>
+          </ul>
+          <div class="output-tag">
+            <span class="out-label">Output</span>
+            <span class="out-val">Creatives &amp; assets</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Panel 3 -->
+      <div class="flow-panel" data-index="2">
+        <div class="flow-panel-title-vertical">03. Playbooks</div>
+        <div class="flow-panel-inner">
+          <div class="step-num">03</div>
+          <h3><em>Use Cases</em> Library</h3>
+          <p class="flow-desc">Pre-built industry workflows so you don't start from scratch.</p>
+          <ul class="sub-list">
+            <li><b>Fashion</b>Photoshoots, drops, seasonals</li>
+            <li><b>Real estate</b>Locality stories, walkthroughs</li>
+            <li><b>+12 more</b>Gaming, D2C, edu, food, beauty</li>
+          </ul>
+          <div class="output-tag">
+            <span class="out-label">Output</span>
+            <span class="out-val">Campaign blueprints</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Panel 4 -->
+      <div class="flow-panel" data-index="3">
+        <div class="flow-panel-title-vertical">04. Launch</div>
+        <div class="flow-panel-inner">
+          <div class="step-num">04</div>
+          <h3><em>Launch</em> &amp; Distribute</h3>
+          <p class="flow-desc">Native integration to every channel that matters in India.</p>
+          <ul class="sub-list">
+            <li><b>Meta Ads</b>Facebook &amp; Instagram</li>
+            <li><b>Google</b>Search, Display, YouTube</li>
+            <li><b>Hotstar &amp; TikTok</b>Performance ready</li>
+          </ul>
+          <div class="output-tag">
+            <span class="out-label">Output</span>
+            <span class="out-val">Live multi-channel</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Panel 5 -->
+      <div class="flow-panel" data-index="4">
+        <div class="flow-panel-title-vertical">05. Optimize</div>
+        <div class="flow-panel-inner">
+          <div class="step-num">05</div>
+          <h3><em>Optimize</em> &amp; Scale</h3>
+          <p class="flow-desc">AI watches every metric and shifts spend to what wins.</p>
+          <ul class="sub-list">
+            <li><b>A/B testing</b>Hooks, copies, audiences</li>
+            <li><b>Budget allocation</b>Auto-shifted to winners</li>
+            <li><b>Retargeting</b>Behaviour-aware automation</li>
+          </ul>
+          <div class="output-tag">
+            <span class="out-label">Output</span>
+            <span class="out-val">Lower CPA, higher ROI</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Continuous loop -->
+    <div class="loop-strip" style="margin-top: 40px;">
+      <span class="ic">∞</span>
+      <span>Continuous learning loop</span>
+      <span class="arr">→</span>
+      <span>Data collection</span>
+      <span class="arr">→</span>
+      <span>AI pattern recognition</span>
+      <span class="arr">→</span>
+      <span>Smarter targeting next cycle</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== METHODOLOGY SECTION ===== -->
+<section class="section methodology-section" id="features">
+  <div class="wrap">
+
+    <div class="section-head">
+      <div>
+        <div class="section-label">02 — The intelligence</div>
+        <h2 class="section-title">How Sutra <em>thinks</em> — and creates.</h2>
+      </div>
+      <div class="section-aside">
+        Two systems in sequence. One understands your market. The other builds your creative.
+      </div>
+    </div>
+
+    <!-- ── Consumer Intelligence Model ── -->
+    <div class="cim-block">
+      <div class="cim-layout">
+
+        <div class="cim-canvas-wrap">
+          <canvas class="cim-canvas" width="440" height="400"></canvas>
+        </div>
+
+        <div>
+          <div class="meth-subtitle">Consumer Intelligence Model</div>
+          <h3 class="meth-h3">Four data layers.<br/><em>One audience truth.</em></h3>
+          <p class="meth-lead">Before a single rupee is spent, Sutra maps your ideal buyer across four dimensions that most marketing tools ignore entirely.</p>
+
+          <div class="cim-layers">
+            <div class="cim-layer">
+              <div class="cl-icon">i</div>
+              <div class="cl-content">
+                <h4>Demographics</h4>
+                <p>Age, gender, income band, geography — resolution down to district level.</p>
+              </div>
+            </div>
+            <div class="cim-layer">
+              <div class="cl-icon">ii</div>
+              <div class="cl-content">
+                <h4>Behavioural Signals</h4>
+                <p>Purchase triggers, scroll patterns, seasonal sensitivity, EMI preference.</p>
+              </div>
+            </div>
+            <div class="cim-layer">
+              <div class="cl-icon">iii</div>
+              <div class="cl-content">
+                <h4>Cultural Context</h4>
+                <p>Regional language preference, festival cycles, aspiration archetypes.</p>
+              </div>
+            </div>
+            <div class="cim-layer">
+              <div class="cl-icon">iv</div>
+              <div class="cl-content">
+                <h4>Regional Nuance</h4>
+                <p>What converts in Jaipur won't in Kochi. Sutra knows the difference.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="meth-divider"></div>
+
+    <!-- ── How videos are made ── -->
+    <div class="vp-block">
+      <div class="meth-subtitle">Video Creation Engine</div>
+      <h3 class="meth-h3">Brief in. <em>Broadcast-ready</em> video out.</h3>
+      <p class="meth-lead">Your audience profile feeds directly into the creation engine. Every decision — actor, tone, hook, language — is data-driven, not guessed.</p>
+
+      <div class="vp-pipeline-wrap">
+        <div class="vp-pipeline">
+
+          <div class="vp-step">
+            <span class="vp-step-num">01</span>
+            <div class="vp-step-icon"><svg viewBox="0 0 28 28" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="6.5" y="3.5" width="15" height="21" rx="1.5"/>
+              <line x1="10" y1="9" x2="18" y2="9"/>
+              <line x1="10" y1="13" x2="18" y2="13"/>
+              <line x1="10" y1="17" x2="15" y2="17"/>
+            </svg></div>
+            <h4>Your Brief</h4>
+            <p>Product, goal, budget. Takes two minutes.</p>
+          </div>
+
+          <div class="vp-arrow">
+            <div class="vp-arrow-line"><div class="vp-arrow-dot"></div></div>
+          </div>
+
+          <div class="vp-step">
+            <span class="vp-step-num">02</span>
+            <div class="vp-step-icon"><svg viewBox="0 0 28 28" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+              <circle cx="14" cy="14" r="10.5"/>
+              <circle cx="14" cy="14" r="6.5"/>
+              <circle cx="14" cy="14" r="2" fill="currentColor" stroke="none"/>
+            </svg></div>
+            <h4>Audience Intel</h4>
+            <p>CIM runs. Your buyer profile is built automatically.</p>
+          </div>
+
+          <div class="vp-arrow">
+            <div class="vp-arrow-line"><div class="vp-arrow-dot"></div></div>
+          </div>
+
+          <div class="vp-step">
+            <span class="vp-step-num">03</span>
+            <div class="vp-step-icon"><svg viewBox="0 0 28 28" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M18.5 3.5 L24.5 9.5 L10.5 23.5 L4.5 24.5 L5.5 18.5 Z"/>
+              <line x1="16" y1="6" x2="22" y2="12"/>
+              <line x1="4.5" y1="24.5" x2="9.5" y2="23.5"/>
+            </svg></div>
+            <h4>Script & Direction</h4>
+            <p>AI writes second-by-second creative direction and copy.</p>
+          </div>
+
+          <div class="vp-arrow">
+            <div class="vp-arrow-line"><div class="vp-arrow-dot"></div></div>
+          </div>
+
+          <div class="vp-step">
+            <span class="vp-step-num">04</span>
+            <div class="vp-step-icon"><svg viewBox="0 0 28 28" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+              <circle cx="14" cy="10" r="4"/>
+              <path d="M5.5 24.5 C 5.5 18.5, 22.5 18.5, 22.5 24.5"/>
+              <path d="M22 10 Q 25 12, 22 14" opacity="0.55"/>
+              <path d="M25 8 Q 28.5 12, 25 16" opacity="0.3"/>
+            </svg></div>
+            <h4>Cast & Voice</h4>
+            <p>AI selects actor, visual tone, VO in the right language.</p>
+          </div>
+
+          <div class="vp-arrow">
+            <div class="vp-arrow-line"><div class="vp-arrow-dot"></div></div>
+          </div>
+
+          <div class="vp-step">
+            <span class="vp-step-num">05</span>
+            <div class="vp-step-icon"><svg viewBox="0 0 28 28" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3.5" y="6.5" width="21" height="15" rx="1.5"/>
+              <line x1="3.5" y1="11" x2="24.5" y2="11"/>
+              <line x1="3.5" y1="17" x2="24.5" y2="17"/>
+              <path d="M12 12.5 L17 14 L12 15.5 Z" fill="currentColor" stroke="none"/>
+            </svg></div>
+            <h4>Video Rendered</h4>
+            <p>Full reel generated. Review, tweak, approve.</p>
+          </div>
+
+          <div class="vp-arrow">
+            <div class="vp-arrow-line"><div class="vp-arrow-dot"></div></div>
+          </div>
+
+          <div class="vp-step">
+            <span class="vp-step-num">06</span>
+            <div class="vp-step-icon"><svg viewBox="0 0 28 28" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+              <circle cx="14" cy="14" r="2" fill="currentColor" stroke="none"/>
+              <path d="M9.5 18.5 C 7 16, 7 12, 9.5 9.5"/>
+              <path d="M18.5 18.5 C 21 16, 21 12, 18.5 9.5"/>
+              <path d="M6 22 C 2 18, 2 10, 6 6"/>
+              <path d="M22 22 C 26 18, 26 10, 22 6"/>
+            </svg></div>
+            <h4>Live in 90s</h4>
+            <p>One-click launch to Meta, Google, YouTube, Reels.</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== INDUSTRIES (with intro) ===== -->
+<section class="section" id="industries">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="section-label">03 — Pre-built playbooks</div>
+        <h2 class="section-title">Most founders don't lack ideas. They lack a <em>proven format</em>.</h2>
+      </div>
+      <div class="section-aside">
+        Industry workflows built around what's actually worked — not generic templates.
+      </div>
+    </div>
+
+    <p class="industries-intro">
+      Every industry has its own grammar. A fashion brand needs a model-led reel; a real estate developer needs a locality story; a gaming studio needs a hook in the first 1.5 seconds. We've codified <b>what works for each</b> — the formats, hooks, lengths, platforms, even the time-of-day — into ready-to-launch playbooks. Pick your category. Skip the trial and error.
+    </p>
+
+    <div class="industries">
+
+      <div class="ind-card">
+        <div>
+          <span class="ind-num">01</span>
+          <a href="fashion.html" style="text-decoration:none; color:inherit"><h4><em>Fashion</em><br/>&amp; Apparel</h4></a>
+          <p>AI photoshoots, seasonal drops, model-led reels — no production crew needed.</p>
+        </div>
+        <span class="ind-tag">Surat → Mumbai → US</span>
+      </div>
+
+      <div class="ind-card">
+        <div>
+          <span class="ind-num">02</span>
+          <a href="real-estate.html" style="text-decoration:none; color:inherit"><h4><em>Real</em><br/>Estate</h4></a>
+          <p>Project walkthroughs, locality storytelling, vernacular voice-overs that convert.</p>
+        </div>
+        <span class="ind-tag">Tier-2 launches</span>
+      </div>
+
+      <div class="ind-card">
+        <div>
+          <span class="ind-num">03</span>
+          <a href="gaming.html" style="text-decoration:none; color:inherit"><h4><em>Gaming</em><br/>&amp; Apps</h4></a>
+          <p>Hook-tested UA creatives, gameplay reels, install-optimised ad formats.</p>
+        </div>
+        <span class="ind-tag">User acquisition</span>
+      </div>
+
+      <div class="ind-card">
+        <div>
+          <span class="ind-num">04</span>
+          <a href="d2c.html" style="text-decoration:none; color:inherit"><h4><em>D2C</em><br/>Brands</h4></a>
+          <p>Founder-led storytelling, performance reels, full-funnel campaigns out of the box.</p>
+        </div>
+        <span class="ind-tag">0 → ₹1Cr ARR</span>
+      </div>
+
+      <div class="ind-card">
+        <div>
+          <span class="ind-num">05</span>
+          <a href="education.html" style="text-decoration:none; color:inherit"><h4><em>Edu</em><br/>cation</h4></a>
+          <p>Course launches, cohort fills, parent-targeted creatives in 7+ Indian languages.</p>
+        </div>
+        <span class="ind-tag">Vernacular-first</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== PRICING ===== -->
+<section class="section pricing-section" id="pricing">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="section-label">04 — Pricing</div>
+        <h2 class="section-title">Free to start. <em>Built</em> to scale.</h2>
+      </div>
+      <div class="section-aside">
+        Penetration-priced for the Indian market. No dollar-denominated hostage situations.
+      </div>
+    </div>
+
+    <div class="pricing-grid">
+
+      <div class="plan">
+        <div class="plan-tagline">Free forever</div>
+        <div class="plan-name">Virodh</div>
+        <div class="plan-desc">A small rebellion against expensive tools. Built so any founder can start.</div>
+        <div class="plan-price">₹0</div>
+        <div class="plan-cycle">no card required · no time limit</div>
+        <ul class="plan-features">
+          <li>Basic consumer &amp; audience research</li>
+          <li>Static ad creation tools</li>
+          <li>Industry-curated video scripts</li>
+          <li>Limited campaign planning workflows</li>
+          <li>1 connected ad account</li>
+          <li>Community support</li>
+        </ul>
+        <a class="btn ghost" href="waitlist.html">Start free <span class="arrow">→</span></a>
+      </div>
+
+      <div class="plan featured">
+        <span class="plan-flag">Most popular</span>
+        <div class="plan-tagline">For growing brands</div>
+        <div class="plan-name">Lakshya</div>
+        <div class="plan-desc">For brands running real campaigns without hiring an in-house team. <i style="opacity:0.5">(name TBD)</i></div>
+        <div class="plan-price">₹<span style="font-style:italic;">2,499</span><span class="unit"> /mo</span></div>
+        <div class="plan-cycle">billed monthly · cancel anytime</div>
+        <ul class="plan-features">
+          <li>Everything in Virodh</li>
+          <li>AI ad generation (video + image)</li>
+          <li>Meta &amp; Google Ads launch integration</li>
+          <li>Behavioural &amp; regional research insights</li>
+          <li>200 monthly AI credits</li>
+          <li>Built-in video editor</li>
+          <li>A/B testing on all campaigns</li>
+          <li>Email support &amp; onboarding</li>
+        </ul>
+        <a class="btn" href="waitlist.html">Join waitlist <span class="arrow">→</span></a>
+      </div>
+
+      <div class="plan">
+        <div class="plan-tagline">For organizations</div>
+        <div class="plan-name">Enterprise Solutions</div>
+        <div class="plan-desc">Custom deployments for governments, incubators, B-schools and large brands.</div>
+        <div class="plan-price">Custom</div>
+        <div class="plan-cycle">contract pricing · annual</div>
+        <ul class="plan-features">
+          <li>Everything in Lakshya, unlimited</li>
+          <li>Dedicated onboarding &amp; training cohorts</li>
+          <li>Custom integrations &amp; data ingestion</li>
+          <li>Organizational rollouts &amp; SSO</li>
+          <li>White-label workflows available</li>
+          <li>Workflow consult + named CSM</li>
+          <li>SLA-backed support</li>
+        </ul>
+        <a class="btn ghost" href="waitlist.html">Talk to us <span class="arrow">→</span></a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+
+<!-- ===== FINAL CTA ===== -->
+<section class="final" id="waitlist">
+  <div class="wrap inner">
+    <div class="kicker">Limited beta · First 100 brands onboard free</div>
+    <h2>Stop guessing.<br/>Start <em>growing.</em></h2>
+    <form class="signup" onsubmit="event.preventDefault(); this.querySelector('button').innerHTML='You\u2019re in <span class=\u0027arrow\u0027>✓</span>'; this.querySelector('input').value='';">
+      <input type="email" required placeholder="your@business.in" />
+      <button type="submit" class="btn">Join waitlist <span class="arrow">→</span></button>
+    </form>
+    <div class="final-meta">
+      <span>Free forever tier</span>
+      <span>No credit card</span>
+      <span>India-first pricing</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="wrap row">
+    <a href="index.html" class="logo" style="text-decoration:none"><span>Sutra</span></a><span class="dot" style="background:var(--accent)"></span></div>
+    <div class="copy">© 2025 · Made for Bharat · ◊ Investor deck available</div>
+  </div>
+</footer>
+
+<script src="main.js" defer></script>
+
+</body>
+</html>
