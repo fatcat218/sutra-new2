@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sutra Research Lab — Know your buyer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="research-page">
+
+<canvas id="ring-grid" aria-hidden="true"></canvas>
+
+<nav>
+  <div class="wrap inner">
+    <a class="logo" href="index.html"><span>Sutra</span><span class="dot"></span></a>
+    <div class="nav-links">
+      <a href="how-it-works.html">How it works</a>
+      <a href="index.html#features">Platform</a>
+      <a href="index.html#industries">Industries</a>
+      <a href="about.html">About</a>
+    </div>
+    <a class="btn" href="#research-form">Start research <span class="arrow">→</span></a>
+  </div>
+</nav>
+
+<main>
+  <section class="research-hero">
+    <div class="wrap research-hero-grid">
+      <div class="research-hero-copy">
+        <div class="kicker hero-animate hero-animate-1">
+          <span class="pill">Live product preview</span>
+          <span>01 · Consumer intelligence</span>
+        </div>
+        <h1 class="research-headline">
+          Turn what you know into a clearer picture of <em>who buys.</em>
+        </h1>
+        <p class="research-intro hero-animate hero-animate-3">
+          Tell Sutra about your business. The research engine builds an estimated
+          audience profile, likely motivations, pain points, channels, and campaign
+          directions for the Indian market.
+        </p>
+        <div class="research-trust hero-animate hero-animate-4">
+          <span>Estimated, not claimed fact</span>
+          <span>Saved to your local workspace</span>
+          <span>Powered by OpenRouter</span>
+        </div>
+      </div>
+
+      <div class="research-orbit" aria-hidden="true">
+        <div class="orbit orbit-one"><span></span></div>
+        <div class="orbit orbit-two"><span></span></div>
+        <div class="orbit orbit-three"><span></span></div>
+        <div class="orbit-core">
+          <span class="orbit-monogram">S</span>
+          <span class="orbit-core-label">Audience signal</span>
+        </div>
+        <span class="orbit-tag tag-demographic">Demographic</span>
+        <span class="orbit-tag tag-behaviour">Behaviour</span>
+        <span class="orbit-tag tag-context">Context</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="research-workspace section">
+    <div class="wrap">
+      <div class="section-head research-section-head">
+        <div>
+          <div class="section-label">Build the context</div>
+          <h2 class="section-title">Give the model something <em>real</em> to work with.</h2>
+        </div>
+        <p class="section-aside">
+          A richer description produces a more useful direction. No website is required.
+        </p>
+      </div>
+
+      <div class="research-layout">
+        <form class="research-form-card" id="research-form">
+          <div class="form-card-topline">
+            <div>
+              <span class="form-step">Input · 01</span>
+              <h3>Business profile</h3>
+            </div>
+            <span class="form-required">* Required</span>
+          </div>
+
+          <div class="research-form-grid">
+            <label class="field">
+              <span>Business name *</span>
+              <input id="business_name" name="business_name" type="text" maxlength="255" required placeholder="e.g. Surat Threads">
+            </label>
+
+            <label class="field">
+              <span>Industry</span>
+              <input id="industry" name="industry" type="text" maxlength="255" placeholder="e.g. Fashion & Apparel">
+            </label>
+
+            <label class="field field-wide">
+              <span>Location or target market</span>
+              <input id="location" name="location" type="text" maxlength="255" placeholder="e.g. Surat, selling across India">
+            </label>
+
+            <label class="field field-wide">
+              <span>Describe the business *</span>
+              <textarea id="business_description" name="business_description" rows="6" required placeholder="What do you sell, who tends to buy it, what makes it different, and what price range or market are you targeting?"></textarea>
+              <small>Use at least a few sentences for a stronger research direction.</small>
+            </label>
+          </div>
+
+          <details class="source-details">
+            <summary>
+              <span>
+                <b>Add online sources</b>
+                <small>Optional, useful for extra context</small>
+              </span>
+              <span class="details-plus">+</span>
+            </summary>
+            <div class="research-form-grid source-grid">
+              <label class="field field-wide">
+                <span>Website</span>
+                <input id="website_url" name="website_url" type="url" placeholder="https://yourbusiness.com">
+              </label>
+              <label class="field">
+                <span>Instagram</span>
+                <input id="instagram_url" name="instagram_url" type="url" placeholder="https://instagram.com/brand">
+              </label>
+              <label class="field">
+                <span>LinkedIn</span>
+                <input id="linkedin_url" name="linkedin_url" type="url" placeholder="https://linkedin.com/company/brand">
+              </label>
+              <label class="field field-wide">
+                <span>Competitor URLs</span>
+                <textarea id="competitor_urls" name="competitor_urls" rows="3" placeholder="One URL per line"></textarea>
+              </label>
+            </div>
+          </details>
+
+          <div class="form-submit-row">
+            <p>
+              Results are AI-generated estimates. Validate important decisions with
+              customer interviews and real campaign data.
+            </p>
+            <button class="btn research-submit" id="research-submit" type="submit">
+              <span class="submit-label">Generate research</span>
+              <span class="arrow">→</span>
+            </button>
+          </div>
+        </form>
+
+        <aside class="research-guide">
+          <span class="form-step">Output · 02</span>
+          <h3>What Sutra looks for</h3>
+          <div class="guide-list">
+            <div class="guide-item">
+              <span>01</span>
+              <div><b>Audience shape</b><p>Likely age bands, demographics, regions, and socioeconomic context.</p></div>
+            </div>
+            <div class="guide-item">
+              <span>02</span>
+              <div><b>Decision signals</b><p>Motivations, frictions, behaviours, and what earns trust.</p></div>
+            </div>
+            <div class="guide-item">
+              <span>03</span>
+              <div><b>Go-to-market direction</b><p>Channels, campaign angles, and useful next questions.</p></div>
+            </div>
+          </div>
+          <div class="guide-note">
+            <span class="signal-dot"></span>
+            <p><b>Better context, better signal.</b> Add specifics such as pricing, current customers, purchase occasions, and where orders come from.</p>
+          </div>
+        </aside>
+      </div>
+
+      <section class="research-state" id="research-loading" hidden aria-live="polite">
+        <div class="analysis-visual" aria-hidden="true">
+          <span class="analysis-ring ring-a"></span>
+          <span class="analysis-ring ring-b"></span>
+          <span class="analysis-ring ring-c"></span>
+          <span class="analysis-core">S</span>
+        </div>
+        <span class="form-step">Analysis in progress</span>
+        <h2>Finding the audience beneath the description.</h2>
+        <p id="loading-message">Structuring your business context...</p>
+        <div class="analysis-progress"><span></span></div>
+      </section>
+
+      <section class="research-error" id="research-error" hidden role="alert">
+        <span class="error-mark">!</span>
+        <div>
+          <span class="form-step">Research interrupted</span>
+          <h3>We could not finish this report.</h3>
+          <p id="error-message"></p>
+        </div>
+        <button class="btn ghost" id="error-retry" type="button">Try again</button>
+      </section>
+
+      <section class="research-results" id="research-results" hidden aria-live="polite">
+        <div class="results-heading">
+          <div>
+            <div class="section-label">Research complete</div>
+            <h2 id="result-title">Your audience, brought into focus.</h2>
+          </div>
+          <div class="result-meta">
+            <span id="confidence-badge" class="confidence-badge">Confidence · —</span>
+            <span id="report-id" class="report-id">Report —</span>
+          </div>
+        </div>
+
+        <article class="result-summary-card">
+          <span class="result-index">01 · Business read</span>
+          <p id="business-summary"></p>
+          <div class="audience-overview">
+            <span>Likely audience</span>
+            <p id="target-audience-overview"></p>
+          </div>
+        </article>
+
+        <div class="segment-grid">
+          <article class="segment-card segment-primary">
+            <span>Primary segment</span>
+            <h3 id="primary-segment"></h3>
+            <div id="age-groups" class="chip-list"></div>
+          </article>
+          <article class="segment-card">
+            <span>Secondary segment</span>
+            <h3 id="secondary-segment"></h3>
+          </article>
+        </div>
+
+        <div class="analysis-grid">
+          <article class="analysis-card">
+            <span class="result-index">02 · Demographic</span>
+            <p id="demographic-analysis"></p>
+          </article>
+          <article class="analysis-card">
+            <span class="result-index">03 · Socioeconomic</span>
+            <p id="socioeconomic-analysis"></p>
+          </article>
+          <article class="analysis-card">
+            <span class="result-index">04 · Behavioural</span>
+            <p id="behavioral-analysis"></p>
+          </article>
+        </div>
+
+        <div class="insight-grid">
+          <article class="insight-card">
+            <span class="result-index">Buying motivations</span>
+            <ul id="buying-motivations"></ul>
+          </article>
+          <article class="insight-card">
+            <span class="result-index">Pain points</span>
+            <ul id="pain-points"></ul>
+          </article>
+          <article class="insight-card">
+            <span class="result-index">Best channels</span>
+            <div id="best-marketing-channels" class="chip-list"></div>
+          </article>
+          <article class="insight-card campaign-card">
+            <span class="result-index">Campaign angles</span>
+            <ol id="campaign-angles"></ol>
+          </article>
+        </div>
+
+        <div class="follow-up-grid">
+          <article>
+            <span class="result-index">Missing information</span>
+            <ul id="missing-information"></ul>
+          </article>
+          <article>
+            <span class="result-index">Ask next</span>
+            <ol id="follow-up-questions"></ol>
+          </article>
+        </div>
+
+        <section class="creative-next" id="creative-next">
+          <div class="creative-heading">
+            <div>
+              <div class="section-label">Create from this research</div>
+              <h2>Choose the asset you want Sutra to build next.</h2>
+            </div>
+            <p>
+              For now, Video is the only active branch. The other formats are shown
+              so the product path is clear, but their buttons are intentionally parked.
+            </p>
+          </div>
+
+          <div class="creative-option-grid" role="list">
+            <article class="creative-option is-active" role="listitem">
+              <span class="creative-num">01</span>
+              <h3>Video campaign</h3>
+              <p>Turn the research summary into a short ad script, scene flow, voiceover direction, and production checklist.</p>
+              <button class="btn creative-choice" type="button" data-format="video">Design video path <span class="arrow">→</span></button>
+            </article>
+
+            <article class="creative-option is-locked" role="listitem">
+              <span class="creative-num">02</span>
+              <h3>Instagram ads</h3>
+              <p>Static, carousel, reel caption, and story ad variants for Instagram.</p>
+              <button class="btn ghost" type="button" disabled>Coming soon</button>
+            </article>
+
+            <article class="creative-option is-locked" role="listitem">
+              <span class="creative-num">03</span>
+              <h3>YouTube ads</h3>
+              <p>Skippable and bumper ad directions tailored to the same audience insight.</p>
+              <button class="btn ghost" type="button" disabled>Coming soon</button>
+            </article>
+
+            <article class="creative-option is-locked" role="listitem">
+              <span class="creative-num">04</span>
+              <h3>Posters</h3>
+              <p>Print and digital poster concepts using the audience segment and campaign angles.</p>
+              <button class="btn ghost" type="button" disabled>Coming soon</button>
+            </article>
+          </div>
+
+          <section class="video-branch" id="video-branch" hidden>
+            <div class="video-branch-copy">
+              <span class="form-step">Video branch · backend design</span>
+              <h3>What we need before real video generation</h3>
+              <p>
+                The research report gives us the buyer logic. To create an actual
+                video, the backend also needs production choices, brand assets, and
+                a generation provider.
+              </p>
+            </div>
+
+            <div class="video-brief-layout">
+              <form class="video-intake" id="video-intake">
+                <label class="field">
+                  <span>Video goal</span>
+                  <select id="video_goal">
+                    <option>Awareness</option>
+                    <option>Lead generation</option>
+                    <option>Sales conversion</option>
+                    <option>Product launch</option>
+                  </select>
+                </label>
+
+                <label class="field">
+                  <span>Primary platform</span>
+                  <select id="video_platform">
+                    <option>Instagram Reels</option>
+                    <option>YouTube Shorts</option>
+                    <option>Meta Ads</option>
+                    <option>YouTube In-stream</option>
+                  </select>
+                </label>
+
+                <label class="field">
+                  <span>Duration</span>
+                  <select id="video_duration">
+                    <option>15 seconds</option>
+                    <option>30 seconds</option>
+                    <option>45 seconds</option>
+                    <option>60 seconds</option>
+                  </select>
+                </label>
+
+                <label class="field">
+                  <span>CTA</span>
+                  <input id="video_cta" type="text" placeholder="e.g. Shop now, Book a demo, WhatsApp us">
+                </label>
+
+                <label class="field field-wide">
+                  <span>Brand style notes</span>
+                  <textarea id="video_style" rows="3" placeholder="Tone, colors, references, language, creator style, product shots available..."></textarea>
+                </label>
+
+                <button class="btn video-brief-button" type="submit">Preview video brief <span class="arrow">→</span></button>
+              </form>
+
+              <aside class="video-needs">
+                <span class="result-index">Backend will need</span>
+                <ul>
+                  <li><b>Report context</b><span>report_id, audience summary, segments, campaign angles.</span></li>
+                  <li><b>Creative settings</b><span>platform, format, duration, goal, CTA, language, offer.</span></li>
+                  <li><b>Brand assets</b><span>logo, product images/video, colors, fonts, references.</span></li>
+                  <li><b>Generation stack</b><span>LLM for script, image/video model, voiceover, storage, job status.</span></li>
+                  <li><b>Review controls</b><span>draft approval, regenerate scenes, export/download.</span></li>
+                </ul>
+              </aside>
+            </div>
+
+            <article class="video-brief-preview" id="video-brief-preview" hidden>
+              <span class="result-index">Draft video direction</span>
+              <h3 id="video-brief-title">Video brief preview</h3>
+              <div class="video-script-grid">
+                <div><span>Audience</span><p id="brief-audience"></p></div>
+                <div><span>Hook</span><p id="brief-hook"></p></div>
+                <div><span>CTA</span><p id="brief-cta"></p></div>
+              </div>
+              <ol id="brief-scenes"></ol>
+            </article>
+          </section>
+        </section>
+
+        <div class="result-actions">
+          <p>This report is saved locally and can be retrieved again using its report ID.</p>
+          <button class="btn ghost" id="new-research" type="button">Start another report</button>
+        </div>
+      </section>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap row">
+    <a href="index.html" class="logo" style="text-decoration:none"><span>Sutra</span><span class="dot"></span></a>
+    <div class="copy">Consumer intelligence · Built for Bharat</div>
+  </div>
+</footer>
+
+<script src="main.js" defer></script>
+<script src="research.js" defer></script>
+</body>
+</html>

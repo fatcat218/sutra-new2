@@ -1,0 +1,23 @@
+.DS_Store
+
+# Local environment files and secrets
+.env
+.env.*
+!.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
+
+# Python backend local state
+backend/.venv/
+backend/venv/
+backend/__pycache__/
+backend/**/*.pyc
+backend/*.db
+backend/*.sqlite
+backend/*.sqlite3
+backend/sutra_local.db
+
+# Editor and OS noise
+.idea/
+.vscode/
