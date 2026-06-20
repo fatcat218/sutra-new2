@@ -6,7 +6,7 @@ real work lives here.
 
 Steps (this is the main backend flow):
   1. Persist the submitted business profile -> businesses table.
-  2. If a website_url was given, scrape a bit of text from it (best-effort).
+  2. If URLs were given, scrape useful public page context (best-effort).
   3. Build a single clean "business_context" string from the form + scrape.
   4. Call the AI provider via ai_service to get the structured report.
   5. Validate/normalise the report against the Pydantic schema.
@@ -16,7 +16,7 @@ Steps (this is the main backend flow):
 
 from __future__ import annotations
 
-from typing import List
+from typing import List, Tuple
 
 from sqlalchemy.orm import Session
 
@@ -29,9 +29,7 @@ def _urls_to_str_list(urls) -> List[str]:
     return [str(u) for u in urls] if urls else []
 
 
-def _build_business_context(
-    payload: schemas.ResearchStartRequest, scraped_text: str
-) -> str:
+def _build_business_context(payload: schemas.ResearchStartRequest, scraped_text: str) -> str:
     """
     Assemble everything we know about the business into one readable block.
     Only include fields that were actually provided so the AI can judge how
@@ -56,12 +54,40 @@ def _build_business_context(
         lines.append("Competitor URLs: " + ", ".join(_urls_to_str_list(payload.competitor_urls)))
 
     if scraped_text:
-        lines.append("\n--- Text scraped from the business website ---")
+        lines.append("\n--- Public website context scraped from submitted URLs ---")
         lines.append(scraped_text)
     else:
         lines.append("\n(No website text was scraped / available.)")
 
     return "\n".join(lines)
+
+
+def _scrape_sources(payload: schemas.ResearchStartRequest) -> str:
+    """
+    Scrape the user's own website and a small number of competitor URLs.
+    We keep this capped so the LLM prompt stays useful instead of becoming a
+    giant raw page dump.
+    """
+    sources: List[Tuple[str, str]] = []
+    if payload.website_url:
+        sources.append(("Business website", str(payload.website_url)))
+    for index, url in enumerate(_urls_to_str_list(payload.competitor_urls)[:3], start=1):
+        sources.append((f"Competitor website {index}", url))
+
+    blocks: List[str] = []
+    remaining_chars = 18000
+    for label, url in sources:
+        scraped = scraper_service.scrape_website(url)
+        if not scraped:
+            continue
+        block = f"\n### {label}: {url}\n{scraped}"
+        if len(block) > remaining_chars:
+            block = block[:remaining_chars]
+        blocks.append(block)
+        remaining_chars -= len(block)
+        if remaining_chars <= 0:
+            break
+    return "\n".join(blocks).strip()
 
 
 def run_research(db: Session, payload: schemas.ResearchStartRequest):
@@ -84,10 +110,8 @@ def run_research(db: Session, payload: schemas.ResearchStartRequest):
     db.commit()
     db.refresh(business)
 
-    # 2. Best-effort scrape of the website (only if a URL was provided).
-    scraped_text = ""
-    if payload.website_url:
-        scraped_text = scraper_service.scrape_website(str(payload.website_url))
+    # 2. Best-effort scrape of submitted public websites.
+    scraped_text = _scrape_sources(payload)
 
     # 3. Build the unified context string for the AI.
     business_context = _build_business_context(payload, scraped_text)

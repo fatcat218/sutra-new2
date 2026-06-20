@@ -1,299 +1,328 @@
+/*
+ * research.js — Sutra conversational research flow.
+ *
+ *   1. User enters a website (optional) and clicks "Try researching".
+ *   2. A mock registration overlay appears.
+ *   3. On register, we open a chat session on the backend.
+ *   4. The chatbot greets the user. They can fill the template OR go free mode,
+ *      then keep sending follow-up messages on the same session.
+ *
+ * Auth is mock/prototype: the account lives only in the browser (localStorage),
+ * there is no real server-side user. The chat session, however, is real and
+ * persisted in the backend SQLite DB.
+ */
 (function () {
   const API_BASE = window.SUTRA_API_URL || "http://127.0.0.1:8000";
-  const form = document.getElementById("research-form");
-  if (!form) return;
 
-  const submitButton = document.getElementById("research-submit");
-  const loading = document.getElementById("research-loading");
-  const results = document.getElementById("research-results");
-  const errorPanel = document.getElementById("research-error");
-  const errorMessage = document.getElementById("error-message");
-  const loadingMessage = document.getElementById("loading-message");
-  const videoBranch = document.getElementById("video-branch");
-  const videoIntake = document.getElementById("video-intake");
-  const videoPreview = document.getElementById("video-brief-preview");
-  const loadingSteps = [
-    "Structuring your business context...",
-    "Mapping likely audience segments...",
-    "Reading motivations and buying friction...",
-    "Shaping channels and campaign directions...",
-    "Normalising the final research report..."
-  ];
-  let loadingTimer;
-  let latestReportResponse = null;
+  // --- element handles ----------------------------------------------------
+  const websiteGate = document.getElementById("website-gate");
+  const websiteInput = document.getElementById("website_url");
 
-  function value(id) {
-    const element = document.getElementById(id);
-    return element ? element.value.trim() : "";
-  }
+  const authOverlay = document.getElementById("auth-overlay");
+  const authForm = document.getElementById("auth-form");
+  const authClose = document.getElementById("auth-close");
 
-  function optionalUrl(id) {
-    return value(id) || null;
-  }
+  const chatSection = document.getElementById("chat-section");
+  const chatUserTag = document.getElementById("chat-user-tag");
+  const messagesEl = document.getElementById("chat-messages");
+  const composer = document.getElementById("chat-composer");
+  const input = document.getElementById("chat-input");
+  const sendBtn = document.getElementById("chat-send");
+  const errorEl = document.getElementById("chat-error");
 
-  function competitorUrls() {
-    return value("competitor_urls")
-      .split(/[\n,]+/)
-      .map((url) => url.trim())
-      .filter(Boolean);
-  }
+  const modeButtons = document.querySelectorAll(".chat-mode-btn");
+  const templateForm = document.getElementById("chat-template");
+  const templateFieldsEl = document.getElementById("template-fields");
+  const freeNote = document.getElementById("free-note");
+  const defaultFreeNoteHtml = freeNote ? freeNote.innerHTML : "";
 
-  function setLoading(isLoading) {
-    submitButton.disabled = isLoading;
-    submitButton.classList.toggle("is-loading", isLoading);
-    submitButton.querySelector(".submit-label").textContent = isLoading
-      ? "Analysing"
-      : "Generate research";
+  if (!websiteGate) return;
 
-    if (isLoading) {
-      loading.hidden = false;
-      results.hidden = true;
-      errorPanel.hidden = true;
-      let index = 0;
-      loadingMessage.textContent = loadingSteps[index];
-      clearInterval(loadingTimer);
-      loadingTimer = setInterval(() => {
-        index = (index + 1) % loadingSteps.length;
-        loadingMessage.textContent = loadingSteps[index];
-      }, 2800);
-      loading.scrollIntoView({ behavior: "smooth", block: "center" });
-    } else {
-      clearInterval(loadingTimer);
-      loading.hidden = true;
-    }
-  }
+  // --- state --------------------------------------------------------------
+  const state = {
+    user: null, // { name, email }
+    website: "",
+    sessionId: null,
+    templateFields: [],
+    templateSubmitted: false,
+    busy: false,
+  };
 
-  function setText(id, text, fallback) {
-    const element = document.getElementById(id);
-    element.textContent = text || fallback || "Not enough information yet.";
-  }
-
-  function renderList(id, values, ordered) {
-    const list = document.getElementById(id);
-    list.replaceChildren();
-    const items = Array.isArray(values) && values.length
-      ? values
-      : ["Not enough information yet."];
-
-    items.forEach((item, index) => {
-      const li = document.createElement("li");
-      if (ordered) {
-        const number = document.createElement("span");
-        number.textContent = String(index + 1).padStart(2, "0");
-        li.append(number);
-      }
-      const text = document.createElement("p");
-      text.textContent = item;
-      li.append(text);
-      list.append(li);
-    });
-  }
-
-  function renderChips(id, values) {
-    const container = document.getElementById(id);
-    container.replaceChildren();
-    const items = Array.isArray(values) && values.length ? values : ["Not specified"];
-    items.forEach((item) => {
-      const chip = document.createElement("span");
-      chip.textContent = item;
-      container.append(chip);
-    });
-  }
-
-  function renderReport(response) {
-    latestReportResponse = response;
-    const report = response.report_json || {};
-    setText("business-summary", report.business_summary);
-    setText("target-audience-overview", report.target_audience_overview);
-    setText("primary-segment", report.primary_segment);
-    setText("secondary-segment", report.secondary_segment);
-    setText("demographic-analysis", report.demographic_analysis);
-    setText("socioeconomic-analysis", report.socioeconomic_analysis);
-    setText("behavioral-analysis", report.behavioral_analysis);
-
-    renderChips("age-groups", report.age_groups);
-    renderList("buying-motivations", report.buying_motivations);
-    renderList("pain-points", report.pain_points);
-    renderChips("best-marketing-channels", report.best_marketing_channels);
-    renderList("campaign-angles", report.campaign_angles, true);
-    renderList("missing-information", report.missing_information);
-    renderList("follow-up-questions", report.recommended_follow_up_questions, true);
-
-    const confidence = (report.confidence_score || "unknown").toLowerCase();
-    const badge = document.getElementById("confidence-badge");
-    badge.textContent = `Confidence · ${confidence}`;
-    badge.dataset.level = confidence;
-    document.getElementById("report-id").textContent = `Report ${response.report_id}`;
-    document.getElementById("result-title").textContent =
-      `${value("business_name") || "Your business"}, brought into focus.`;
-
-    results.hidden = false;
-    results.classList.remove("is-visible");
-    requestAnimationFrame(() => results.classList.add("is-visible"));
-    results.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  function firstItem(values, fallback) {
-    return Array.isArray(values) && values.length ? values[0] : fallback;
-  }
-
-  function selectValue(id) {
-    const element = document.getElementById(id);
-    return element ? element.value : "";
-  }
-
-  function showVideoBranch() {
-    if (!videoBranch) return;
-    videoBranch.hidden = false;
-    videoBranch.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  function renderVideoBrief(event) {
+  // =======================================================================
+  // STEP 1 + 2 — website gate -> open register overlay
+  // =======================================================================
+  websiteGate.addEventListener("submit", (event) => {
     event.preventDefault();
-    if (!latestReportResponse) return;
+    state.website = (websiteInput.value || "").trim();
+    openAuth();
+  });
 
-    const report = latestReportResponse.report_json || {};
-    const businessName = value("business_name") || "this business";
-    const duration = selectValue("video_duration") || "15 seconds";
-    const platform = selectValue("video_platform") || "Instagram Reels";
-    const goal = selectValue("video_goal") || "Awareness";
-    const cta = value("video_cta") || "Learn more";
-    const style = value("video_style") || "Keep it sharp, credible, and rooted in the audience insight.";
-    const audience = report.primary_segment || report.target_audience_overview || "The likely primary audience from the research report.";
-    const hook = firstItem(
-      report.campaign_angles,
-      "Open with the clearest pain point or aspiration from the research report."
-    );
-
-    document.getElementById("video-brief-title").textContent =
-      `${duration} ${platform} direction for ${businessName}`;
-    setText("brief-audience", audience);
-    setText("brief-hook", hook);
-    setText("brief-cta", cta);
-
-    const scenes = [
-      {
-        label: "0-3s",
-        title: "Pattern-break hook",
-        body: `${hook} Show the audience problem immediately, using a visual that feels native to ${platform}.`
-      },
-      {
-        label: "3-7s",
-        title: "Audience mirror",
-        body: `Reflect the primary segment: ${audience}`
-      },
-      {
-        label: "7-12s",
-        title: "Product proof",
-        body: `${report.business_summary || "Introduce the product clearly."} Add product shots, proof points, or founder voice.`
-      },
-      {
-        label: "Final beat",
-        title: "CTA",
-        body: `${cta}. Style notes: ${style} Goal: ${goal}.`
-      }
-    ];
-
-    const sceneList = document.getElementById("brief-scenes");
-    sceneList.replaceChildren();
-    scenes.forEach((scene) => {
-      const item = document.createElement("li");
-      const label = document.createElement("span");
-      const title = document.createElement("b");
-      const body = document.createElement("p");
-      label.textContent = scene.label;
-      title.textContent = scene.title;
-      body.textContent = scene.body;
-      item.append(label, title, body);
-      sceneList.append(item);
-    });
-
-    videoPreview.hidden = false;
-    videoPreview.scrollIntoView({ behavior: "smooth", block: "center" });
+  function openAuth() {
+    authOverlay.hidden = false;
+    document.body.classList.add("no-scroll");
+    setTimeout(() => document.getElementById("reg_name").focus(), 50);
   }
 
-  function friendlyError(error, responseStatus) {
-    if (error.name === "AbortError") {
-      return "The analysis took too long. Check that the backend is still running, then try again.";
-    }
-    if (responseStatus === 502) {
-      return `${error.message} Check the OpenRouter key, model access, and account credits.`;
-    }
-    if (responseStatus === 422) {
-      return error.message || "Some form details were not accepted. Check the fields and try again.";
-    }
-    if (error instanceof TypeError) {
-      return "The frontend could not reach the backend. Keep Uvicorn running on port 8000 and try again.";
-    }
-    return error.message || "An unexpected error occurred. Check the backend terminal for details.";
+  function closeAuth() {
+    authOverlay.hidden = true;
+    document.body.classList.remove("no-scroll");
   }
 
-  async function generateResearch(event) {
+  authClose.addEventListener("click", closeAuth);
+  authOverlay.addEventListener("click", (event) => {
+    if (event.target === authOverlay) closeAuth();
+  });
+
+  // =======================================================================
+  // STEP 3 — mock registration -> start chat session
+  // =======================================================================
+  authForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!form.reportValidity()) return;
+    const name = document.getElementById("reg_name").value.trim();
+    const email = document.getElementById("reg_email").value.trim();
 
-    const payload = {
-      business_name: value("business_name"),
-      industry: value("industry") || null,
-      location: value("location") || null,
-      business_description: value("business_description") || null,
-      website_url: optionalUrl("website_url"),
-      instagram_url: optionalUrl("instagram_url"),
-      linkedin_url: optionalUrl("linkedin_url"),
-      competitor_urls: competitorUrls()
-    };
+    state.user = { name, email };
+    // Persist the mock account locally so a refresh keeps them "registered".
+    try {
+      localStorage.setItem("sutra_user", JSON.stringify(state.user));
+    } catch (_) {
+      /* localStorage may be blocked on file:// — non-fatal */
+    }
 
-    setLoading(true);
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 75000);
-    let responseStatus;
+    closeAuth();
+    await startChat();
+  });
+
+  // =======================================================================
+  // STEP 4 — open the chat session and reveal the UI
+  // =======================================================================
+  async function startChat() {
+    chatSection.hidden = false;
+    chatUserTag.textContent = state.user.name
+      ? `Signed in as ${state.user.name}`
+      : "Signed in";
+    chatSection.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    messagesEl.replaceChildren();
+    addTypingBubble();
 
     try {
-      const response = await fetch(`${API_BASE}/api/research/start`, {
+      const res = await fetch(`${API_BASE}/api/chat/start`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        signal: controller.signal
+        body: JSON.stringify({
+          user_email: state.user.email,
+          user_name: state.user.name,
+          website_url: state.website || null,
+          mode: "template",
+        }),
       });
-      responseStatus = response.status;
-      const data = await response.json().catch(() => ({}));
+      const data = await res.json().catch(() => ({}));
+      removeTypingBubble();
+      if (!res.ok) throw new Error(data.detail || `Backend returned ${res.status}.`);
 
-      if (!response.ok) {
-        const detail = Array.isArray(data.detail)
-          ? data.detail.map((item) => item.msg).join(" ")
-          : data.detail;
-        throw new Error(detail || `The backend returned status ${response.status}.`);
-      }
-
-      setLoading(false);
-      renderReport(data);
+      state.sessionId = data.session_id;
+      state.templateFields = data.template_fields || [];
+      state.templateSubmitted = false;
+      buildTemplate(state.templateFields);
+      freeNote.innerHTML = defaultFreeNoteHtml;
+      showTemplateMode();
+      addMessage("assistant", data.greeting);
     } catch (error) {
-      setLoading(false);
-      errorMessage.textContent = friendlyError(error, responseStatus);
-      errorPanel.hidden = false;
-      errorPanel.scrollIntoView({ behavior: "smooth", block: "center" });
-    } finally {
-      clearTimeout(timeout);
+      removeTypingBubble();
+      showError(friendlyError(error));
     }
   }
 
-  form.addEventListener("submit", generateResearch);
-  document.getElementById("error-retry").addEventListener("click", () => {
-    errorPanel.hidden = true;
-    form.requestSubmit();
+  // --- template builder ---------------------------------------------------
+  function buildTemplate(fields) {
+    templateFieldsEl.replaceChildren();
+    fields.forEach((field) => {
+      const label = document.createElement("label");
+      label.className = "field";
+      const span = document.createElement("span");
+      span.textContent = field.required ? `${field.label} *` : field.label;
+      const inputEl = document.createElement("input");
+      inputEl.type = "text";
+      inputEl.dataset.key = field.key;
+      inputEl.placeholder = field.placeholder || "";
+      if (field.required) inputEl.required = true;
+      label.append(span, inputEl);
+      templateFieldsEl.append(label);
+    });
+  }
+
+  // Compose a single first message out of the filled template fields.
+  templateForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const inputs = templateFieldsEl.querySelectorAll("input");
+    const lines = [];
+    const labelFor = {};
+    state.templateFields.forEach((f) => (labelFor[f.key] = f.label));
+
+    inputs.forEach((el) => {
+      const val = el.value.trim();
+      if (val) lines.push(`${labelFor[el.dataset.key] || el.dataset.key}: ${val}`);
+    });
+
+    if (!lines.length) {
+      showError("Add at least one detail, or switch to Free mode and just type.");
+      return;
+    }
+
+    const message =
+      "Here are my business details. Please give me an estimated audience " +
+      "research breakdown.\n\n" +
+      lines.join("\n");
+    sendMessage(message);
+    clearTemplateAfterSubmit();
   });
-  document.getElementById("new-research").addEventListener("click", () => {
-    results.hidden = true;
-    latestReportResponse = null;
-    if (videoBranch) videoBranch.hidden = true;
-    if (videoPreview) videoPreview.hidden = true;
-    form.scrollIntoView({ behavior: "smooth", block: "start" });
-    document.getElementById("business_name").focus({ preventScroll: true });
+
+  // --- mode switch --------------------------------------------------------
+  modeButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const free = btn.dataset.mode === "free";
+      if (free) {
+        showFreeMode();
+      } else {
+        showTemplateMode();
+      }
+      if (free) input.focus();
+    });
   });
-  document.querySelectorAll(".creative-choice[data-format='video']").forEach((button) => {
-    button.addEventListener("click", showVideoBranch);
+
+  function showTemplateMode() {
+    if (state.templateSubmitted) return showFreeMode();
+    modeButtons.forEach((b) => b.classList.toggle("is-active", b.dataset.mode === "template"));
+    templateForm.hidden = false;
+    freeNote.hidden = true;
+  }
+
+  function showFreeMode() {
+    modeButtons.forEach((b) => b.classList.toggle("is-active", b.dataset.mode === "free"));
+    templateForm.hidden = true;
+    freeNote.hidden = false;
+  }
+
+  function clearTemplateAfterSubmit() {
+    state.templateSubmitted = true;
+    templateForm.reset();
+    showFreeMode();
+    freeNote.innerHTML =
+      "<p><b>Business info sent.</b> The template is cleared now. Keep chatting here to refine the audience, ask for ad angles, or add more product context.</p>";
+    input.focus();
+  }
+
+  // =======================================================================
+  // Conversation — send messages + follow-ups on the same session
+  // =======================================================================
+  composer.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const text = input.value.trim();
+    if (!text) return;
+    sendMessage(text);
   });
-  if (videoIntake) {
-    videoIntake.addEventListener("submit", renderVideoBrief);
+
+  // Enter to send, Shift+Enter for newline; auto-grow the textarea.
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      composer.requestSubmit();
+    }
+  });
+  input.addEventListener("input", () => {
+    input.style.height = "auto";
+    input.style.height = Math.min(input.scrollHeight, 160) + "px";
+  });
+
+  async function sendMessage(text) {
+    if (state.busy || !state.sessionId) return;
+    hideError();
+    addMessage("user", text);
+    input.value = "";
+    input.style.height = "auto";
+    setBusy(true);
+    addTypingBubble();
+
+    try {
+      const res = await fetch(`${API_BASE}/api/chat/message`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: state.sessionId, message: text }),
+      });
+      const data = await res.json().catch(() => ({}));
+      removeTypingBubble();
+      if (!res.ok) throw new Error(data.detail || `Backend returned ${res.status}.`);
+      addMessage("assistant", data.reply);
+    } catch (error) {
+      removeTypingBubble();
+      showError(friendlyError(error));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // =======================================================================
+  // UI helpers
+  // =======================================================================
+  function addMessage(role, text) {
+    const row = document.createElement("div");
+    row.className = `chat-msg chat-msg-${role}`;
+    const bubble = document.createElement("div");
+    bubble.className = "chat-bubble";
+    // Preserve line breaks without injecting HTML.
+    String(text || "").split("\n").forEach((line, i) => {
+      if (i) bubble.append(document.createElement("br"));
+      bubble.append(document.createTextNode(line));
+    });
+    row.append(bubble);
+    messagesEl.append(row);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function addTypingBubble() {
+    const row = document.createElement("div");
+    row.className = "chat-msg chat-msg-assistant chat-typing";
+    row.id = "chat-typing";
+    row.innerHTML =
+      '<div class="chat-bubble"><span class="dot-typing"></span>' +
+      '<span class="dot-typing"></span><span class="dot-typing"></span></div>';
+    messagesEl.append(row);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function removeTypingBubble() {
+    const el = document.getElementById("chat-typing");
+    if (el) el.remove();
+  }
+
+  function setBusy(isBusy) {
+    state.busy = isBusy;
+    sendBtn.disabled = isBusy;
+    input.disabled = isBusy;
+  }
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.hidden = false;
+  }
+  function hideError() {
+    errorEl.hidden = true;
+  }
+
+  function friendlyError(error) {
+    if (error instanceof TypeError) {
+      return "Couldn't reach the backend. Keep Uvicorn running on port 8000 and try again.";
+    }
+    return error.message || "Something went wrong. Check the backend terminal.";
+  }
+
+  // If the user already "registered" earlier (this browser), remember it but
+  // still require the explicit "Try researching" click to open the chat.
+  try {
+    const saved = localStorage.getItem("sutra_user");
+    if (saved) state.user = JSON.parse(saved);
+  } catch (_) {
+    /* ignore */
   }
 })();

@@ -107,3 +107,51 @@ class HealthResponse(BaseModel):
     status: str
     ai_provider: str
     database: str
+
+
+# --------------------------------------------------------------------------- #
+# 4. CHATBOT
+# --------------------------------------------------------------------------- #
+class ChatTemplateField(BaseModel):
+    key: str
+    label: str
+    placeholder: str
+    required: bool = False
+
+
+class ChatStartRequest(BaseModel):
+    """Open a new chat session. All fields optional (mock auth)."""
+
+    user_email: Optional[str] = Field(None, max_length=255)
+    user_name: Optional[str] = Field(None, max_length=255)
+    website_url: Optional[str] = Field(None, max_length=512)
+    mode: Optional[str] = Field(None, max_length=32)  # "template" | "free"
+
+
+class ChatMessageItem(BaseModel):
+    role: str
+    content: str
+
+    class Config:
+        from_attributes = True
+
+
+class ChatStartResponse(BaseModel):
+    session_id: int
+    greeting: str
+    template_fields: List[ChatTemplateField]
+
+
+class ChatSendRequest(BaseModel):
+    session_id: int
+    message: str = Field(..., min_length=1)
+
+
+class ChatSendResponse(BaseModel):
+    session_id: int
+    reply: str
+
+
+class ChatHistoryResponse(BaseModel):
+    session_id: int
+    messages: List[ChatMessageItem]
