@@ -21,3 +21,7 @@ backend/sutra_local.db
 # Editor and OS noise
 .idea/
 .vscode/
+
+# Local editor/temp backups
+.fuse_hidden*
+*.darkbak

@@ -115,19 +115,19 @@ const io = new IntersectionObserver((entries)=>{
             // ring
             ctx.beginPath();
             ctx.arc(x, y, radius, 0, Math.PI * 2);
-            ctx.strokeStyle = `rgba(242,234,224,${alpha})`;
+            ctx.strokeStyle = `rgba(6,40,30,${alpha})`;
             ctx.lineWidth = 1;
             ctx.stroke();
             // inner brightness
             ctx.beginPath();
             ctx.arc(x, y, radius * 0.35, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(230,138,149,${alpha * 0.9})`;
+            ctx.fillStyle = `rgba(6,64,43,${alpha * 0.9})`;
             ctx.fill();
           } else {
             // soft dot
             ctx.beginPath();
             ctx.arc(x, y, radius, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(242,234,224,${alpha})`;
+            ctx.fillStyle = `rgba(6,40,30,${alpha})`;
             ctx.fill();
           }
         }
@@ -201,12 +201,12 @@ const io = new IntersectionObserver((entries)=>{
     const cx = W/2, cy = H/2;
 
     // Site palette only — monochrome elegance
-    const ACCENT      = '#8A4F55';
-    const ACCENT_SOFT = '#A56D72';
-    const ACCENT_DEEP = '#6B3B41';
-    const ACCENT_3    = '#B89B6A';
-    const INK_SOFT    = '#4A3A3D';
-    const PAPER_RGB   = '234,226,216';
+    const ACCENT      = '#06402B';
+    const ACCENT_SOFT = '#0A5A3C';
+    const ACCENT_DEEP = '#063D29';
+    const ACCENT_3    = '#1E7A4F';
+    const INK_SOFT    = '#2F6B4E';
+    const PAPER_RGB   = '241,238,230';
 
     const layers = [
       { label:'Demographics', color:ACCENT,      r:140, speed: 0.0026, angle:0.3,  size:6,   trail:[] },
@@ -225,7 +225,7 @@ const io = new IntersectionObserver((entries)=>{
       layers.forEach((l, i) => {
         ctx.beginPath();
         ctx.arc(cx, cy, l.r, 0, Math.PI*2);
-        ctx.strokeStyle = `rgba(42,31,34,${0.05 + (i%2)*0.025})`;
+        ctx.strokeStyle = `rgba(6,40,30,${0.05 + (i%2)*0.025})`;
         ctx.lineWidth = 1;
         ctx.setLineDash([1.5, 7]);
         ctx.stroke();
@@ -269,7 +269,7 @@ const io = new IntersectionObserver((entries)=>{
             ctx.beginPath();
             ctx.moveTo(layers[i].x, layers[i].y);
             ctx.lineTo(layers[j].x, layers[j].y);
-            ctx.strokeStyle = `rgba(138,79,85,${op})`;
+            ctx.strokeStyle = `rgba(6,64,43,${op})`;
             ctx.lineWidth = 0.7;
             ctx.stroke();
           }
@@ -372,8 +372,8 @@ const io = new IntersectionObserver((entries)=>{
       // breathing halo
       const haloR = 26 + pulse * 5;
       const haloGrad = ctx.createRadialGradient(cx, cy, 8, cx, cy, haloR);
-      haloGrad.addColorStop(0, 'rgba(138,79,85,0.35)');
-      haloGrad.addColorStop(1, 'rgba(138,79,85,0)');
+      haloGrad.addColorStop(0, 'rgba(6,64,43,0.35)');
+      haloGrad.addColorStop(1, 'rgba(6,64,43,0)');
       ctx.beginPath();
       ctx.arc(cx, cy, haloR, 0, Math.PI*2);
       ctx.fillStyle = haloGrad;

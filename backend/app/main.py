@@ -36,12 +36,15 @@ if _frontend == "*":
 else:
     _origins = [origin.strip() for origin in _frontend.split(",") if origin.strip()]
     _origins.extend(["http://localhost:3000", "http://127.0.0.1:3000", "http://[::1]:3000"])
+    # Local IDE previews may use a different localhost port.
+    _origins.append("null")  # file:// during quick local previews
     _origins = list(dict.fromkeys(_origins))
     _allow_credentials = True
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_origins,
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$",
     allow_credentials=_allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],

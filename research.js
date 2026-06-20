@@ -1,11 +1,12 @@
 /*
  * research.js — Sutra conversational research flow.
  *
- *   1. User enters a website (optional) and clicks "Try researching".
+ *   1. User chooses guided template or open chat, optionally adds a website,
+ *      then clicks "Try researching".
  *   2. A mock registration overlay appears.
  *   3. On register, we open a chat session on the backend.
- *   4. The chatbot greets the user. They can fill the template OR go free mode,
- *      then keep sending follow-up messages on the same session.
+ *   4. If they filled the setup template, we send that as the first message.
+ *      The chatbot then stays as a clean standalone conversation window.
  *
  * Auth is mock/prototype: the account lives only in the browser (localStorage),
  * there is no real server-side user. The chat session, however, is real and
@@ -17,6 +18,11 @@
   // --- element handles ----------------------------------------------------
   const websiteGate = document.getElementById("website-gate");
   const websiteInput = document.getElementById("website_url");
+  const setupModeButtons = document.querySelectorAll(".setup-mode-card");
+  const setupTemplatePanel = document.getElementById("setup-template-panel");
+  const setupFreePanel = document.getElementById("setup-free-panel");
+  const setupTemplateFieldsEl = document.getElementById("setup-template-fields");
+  const setupError = document.getElementById("setup-error");
 
   const authOverlay = document.getElementById("auth-overlay");
   const authForm = document.getElementById("auth-form");
@@ -30,13 +36,17 @@
   const sendBtn = document.getElementById("chat-send");
   const errorEl = document.getElementById("chat-error");
 
-  const modeButtons = document.querySelectorAll(".chat-mode-btn");
-  const templateForm = document.getElementById("chat-template");
-  const templateFieldsEl = document.getElementById("template-fields");
-  const freeNote = document.getElementById("free-note");
-  const defaultFreeNoteHtml = freeNote ? freeNote.innerHTML : "";
-
   if (!websiteGate) return;
+
+  const fallbackTemplateFields = [
+    { key: "product_name", label: "Product / business name", placeholder: "e.g. Surat Threads", required: true },
+    { key: "what_you_sell", label: "What do you sell?", placeholder: "e.g. Affordable ethnic wear for women", required: true },
+    { key: "industry", label: "Industry", placeholder: "e.g. Fashion & Apparel", required: false },
+    { key: "location", label: "Location / target market", placeholder: "e.g. Surat, selling across India", required: false },
+    { key: "price_range", label: "Price range", placeholder: "e.g. Rs. 800-2500", required: false },
+    { key: "competitors", label: "Competitors", placeholder: "Names or URLs, comma separated", required: false },
+    { key: "goal", label: "Research goal", placeholder: "e.g. Find my core audience and ad angles", required: false },
+  ];
 
   // --- state --------------------------------------------------------------
   const state = {
@@ -44,18 +54,108 @@
     website: "",
     sessionId: null,
     templateFields: [],
-    templateSubmitted: false,
+    setupMode: "template",
+    pendingInitialMessage: "",
     busy: false,
   };
 
   // =======================================================================
   // STEP 1 + 2 — website gate -> open register overlay
   // =======================================================================
+  loadSetupTemplate();
+
+  setupModeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      setSetupMode(button.dataset.mode === "free" ? "free" : "template");
+    });
+  });
+
   websiteGate.addEventListener("submit", (event) => {
     event.preventDefault();
+    hideSetupError();
     state.website = (websiteInput.value || "").trim();
+    state.pendingInitialMessage =
+      state.setupMode === "template" ? composeTemplateMessage() : "";
+
+    if (state.setupMode === "template" && !state.pendingInitialMessage) {
+      showSetupError("Add at least one template detail, or choose Open chat to start blank.");
+      return;
+    }
+
     openAuth();
   });
+
+  async function loadSetupTemplate() {
+    try {
+      const res = await fetch(`${API_BASE}/api/chat/template`);
+      const data = await res.json().catch(() => []);
+      state.templateFields = Array.isArray(data) && data.length ? data : fallbackTemplateFields;
+    } catch (_) {
+      state.templateFields = fallbackTemplateFields;
+    }
+    buildSetupTemplate(state.templateFields);
+  }
+
+  function setSetupMode(mode) {
+    state.setupMode = mode;
+    const free = mode === "free";
+    setupModeButtons.forEach((button) => {
+      button.classList.toggle("is-active", button.dataset.mode === mode);
+    });
+    setupTemplatePanel.hidden = free;
+    setupFreePanel.hidden = !free;
+    hideSetupError();
+  }
+
+  function buildSetupTemplate(fields) {
+    setupTemplateFieldsEl.replaceChildren();
+    fields.forEach((field) => {
+      if (field.key === "website") return;
+      const label = document.createElement("label");
+      label.className = "field";
+      const span = document.createElement("span");
+      span.textContent = field.required ? `${field.label} *` : field.label;
+      const inputEl = document.createElement("input");
+      inputEl.type = "text";
+      inputEl.dataset.key = field.key;
+      inputEl.placeholder = field.placeholder || "";
+      label.append(span, inputEl);
+      setupTemplateFieldsEl.append(label);
+    });
+  }
+
+  function composeTemplateMessage() {
+    const inputs = setupTemplateFieldsEl.querySelectorAll("input");
+    const lines = [];
+    const labelFor = {};
+    state.templateFields.forEach((field) => {
+      labelFor[field.key] = field.label;
+    });
+
+    if (state.website) {
+      lines.push(`Website: ${state.website}`);
+    }
+    inputs.forEach((el) => {
+      const val = el.value.trim();
+      if (val) lines.push(`${labelFor[el.dataset.key] || el.dataset.key}: ${val}`);
+    });
+
+    if (!lines.length) return "";
+    return (
+      "Here are my business details. Please give me an estimated audience " +
+      "research breakdown.\n\n" +
+      lines.join("\n")
+    );
+  }
+
+  function showSetupError(message) {
+    setupError.textContent = message;
+    setupError.hidden = false;
+  }
+
+  function hideSetupError() {
+    setupError.hidden = true;
+  }
 
   function openAuth() {
     authOverlay.hidden = false;
@@ -114,7 +214,7 @@
           user_email: state.user.email,
           user_name: state.user.name,
           website_url: state.website || null,
-          mode: "template",
+          mode: state.setupMode,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -122,95 +222,15 @@
       if (!res.ok) throw new Error(data.detail || `Backend returned ${res.status}.`);
 
       state.sessionId = data.session_id;
-      state.templateFields = data.template_fields || [];
-      state.templateSubmitted = false;
-      buildTemplate(state.templateFields);
-      freeNote.innerHTML = defaultFreeNoteHtml;
-      showTemplateMode();
       addMessage("assistant", data.greeting);
+      if (state.pendingInitialMessage) {
+        await sendMessage(state.pendingInitialMessage);
+        state.pendingInitialMessage = "";
+      }
     } catch (error) {
       removeTypingBubble();
       showError(friendlyError(error));
     }
-  }
-
-  // --- template builder ---------------------------------------------------
-  function buildTemplate(fields) {
-    templateFieldsEl.replaceChildren();
-    fields.forEach((field) => {
-      const label = document.createElement("label");
-      label.className = "field";
-      const span = document.createElement("span");
-      span.textContent = field.required ? `${field.label} *` : field.label;
-      const inputEl = document.createElement("input");
-      inputEl.type = "text";
-      inputEl.dataset.key = field.key;
-      inputEl.placeholder = field.placeholder || "";
-      if (field.required) inputEl.required = true;
-      label.append(span, inputEl);
-      templateFieldsEl.append(label);
-    });
-  }
-
-  // Compose a single first message out of the filled template fields.
-  templateForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const inputs = templateFieldsEl.querySelectorAll("input");
-    const lines = [];
-    const labelFor = {};
-    state.templateFields.forEach((f) => (labelFor[f.key] = f.label));
-
-    inputs.forEach((el) => {
-      const val = el.value.trim();
-      if (val) lines.push(`${labelFor[el.dataset.key] || el.dataset.key}: ${val}`);
-    });
-
-    if (!lines.length) {
-      showError("Add at least one detail, or switch to Free mode and just type.");
-      return;
-    }
-
-    const message =
-      "Here are my business details. Please give me an estimated audience " +
-      "research breakdown.\n\n" +
-      lines.join("\n");
-    sendMessage(message);
-    clearTemplateAfterSubmit();
-  });
-
-  // --- mode switch --------------------------------------------------------
-  modeButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const free = btn.dataset.mode === "free";
-      if (free) {
-        showFreeMode();
-      } else {
-        showTemplateMode();
-      }
-      if (free) input.focus();
-    });
-  });
-
-  function showTemplateMode() {
-    if (state.templateSubmitted) return showFreeMode();
-    modeButtons.forEach((b) => b.classList.toggle("is-active", b.dataset.mode === "template"));
-    templateForm.hidden = false;
-    freeNote.hidden = true;
-  }
-
-  function showFreeMode() {
-    modeButtons.forEach((b) => b.classList.toggle("is-active", b.dataset.mode === "free"));
-    templateForm.hidden = true;
-    freeNote.hidden = false;
-  }
-
-  function clearTemplateAfterSubmit() {
-    state.templateSubmitted = true;
-    templateForm.reset();
-    showFreeMode();
-    freeNote.innerHTML =
-      "<p><b>Business info sent.</b> The template is cleared now. Keep chatting here to refine the audience, ask for ad angles, or add more product context.</p>";
-    input.focus();
   }
 
   // =======================================================================

@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=claude-ui-20260621">
 </head>
 <body class="research-page">
 
@@ -46,16 +46,43 @@
           keep asking follow-ups until the picture is sharp.
         </p>
 
-        <form class="website-gate hero-animate hero-animate-4" id="website-gate">
-          <label class="field field-wide">
-            <span>Your website</span>
-            <input id="website_url" name="website_url" type="url"
-                   placeholder="https://yourbusiness.com" autocomplete="url">
-            <small>Optional — you can also start with no website at all.</small>
-          </label>
-          <button class="btn" type="submit" id="try-research">
-            Try researching <span class="arrow">→</span>
-          </button>
+        <form class="research-setup hero-animate hero-animate-4" id="website-gate">
+          <div class="setup-mode-grid" aria-label="Choose how to start research">
+            <button type="button" class="setup-mode-card is-active" data-mode="template">
+              <span class="form-step">Guided template</span>
+              <b>Give Sutra useful context first.</b>
+              <small>Best if you already know what you sell, who it is for, or your price range.</small>
+            </button>
+            <button type="button" class="setup-mode-card" data-mode="free">
+              <span class="form-step">Open chat</span>
+              <b>Start without filling anything.</b>
+              <small>Talk to the chatbot directly and let it ask you the missing questions.</small>
+            </button>
+          </div>
+
+          <div class="setup-panel" id="setup-template-panel">
+            <label class="field field-wide">
+              <span>Your website</span>
+              <input id="website_url" name="website_url" type="url"
+                     placeholder="https://yourbusiness.com" autocomplete="url">
+              <small>Optional — Sutra will scrape public pages if it can.</small>
+            </label>
+            <div id="setup-template-fields" class="setup-template-fields"></div>
+          </div>
+
+          <div class="setup-panel setup-free-note" id="setup-free-panel" hidden>
+            <p>
+              No problem. You can open the chat with a blank slate, describe your
+              product naturally, and Sutra will guide the research from there.
+            </p>
+          </div>
+
+          <div class="setup-submit-row">
+            <p id="setup-error" class="setup-error" hidden></p>
+            <button class="btn" type="submit" id="try-research">
+              Try researching <span class="arrow">→</span>
+            </button>
+          </div>
         </form>
 
         <div class="research-trust hero-animate hero-animate-4">
@@ -93,36 +120,7 @@
         <p class="section-aside" id="chat-user-tag">Signed in</p>
       </div>
 
-      <div class="chat-shell">
-        <!-- Mode switch + optional template -->
-        <aside class="chat-side">
-          <div class="chat-mode">
-            <button type="button" class="chat-mode-btn is-active" data-mode="template">
-              Use template
-            </button>
-            <button type="button" class="chat-mode-btn" data-mode="free">
-              Free mode
-            </button>
-          </div>
-
-          <form class="chat-template" id="chat-template">
-            <p class="chat-template-hint">
-              Fill what you can and hit send — or switch to Free mode and just type.
-            </p>
-            <div id="template-fields" class="chat-template-fields"></div>
-            <button class="btn btn-block" type="submit">
-              Send to Sutra <span class="arrow">→</span>
-            </button>
-          </form>
-
-          <div class="chat-free-note" id="free-note" hidden>
-            <p><b>Free mode.</b> Ignore the template and dictate the flow
-            yourself — describe your business, ask for segments, ad angles,
-            anything. Type in the box on the right.</p>
-          </div>
-        </aside>
-
-        <!-- Conversation -->
+      <div class="chat-shell chat-shell-single">
         <div class="chat-main">
           <div class="chat-messages" id="chat-messages" aria-live="polite"></div>
 
@@ -171,7 +169,7 @@
   </div>
 </div>
 
-<script src="main.js" defer></script>
-<script src="research.js" defer></script>
+<script src="main.js?v=claude-ui-20260621" defer></script>
+<script src="research.js?v=claude-ui-20260621" defer></script>
 </body>
 </html>
