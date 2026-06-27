@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Authentication completed — Sutra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=auth-complete-20260627">
+</head>
+<body class="confirmation-page">
+
+<canvas id="ring-grid" aria-hidden="true"></canvas>
+
+<nav>
+  <div class="wrap inner">
+    <a class="logo" href="index.html"><span>Sutra</span><span class="dot"></span></a>
+  </div>
+</nav>
+
+<main class="confirmation-page-main">
+  <section class="confirmation-card" aria-live="polite">
+    <div class="confirmation-mark" id="confirmation-mark">✓</div>
+    <div class="section-label">Account verification</div>
+    <h1 id="confirmation-title">Authentication completed.</h1>
+    <p id="confirmation-message">
+      Your email has been verified. You can close this tab and return to the
+      Sutra chatbot.
+    </p>
+    <a class="btn ghost" href="index.html">Return to home</a>
+  </section>
+</main>
+
+<script src="main.js?v=claude-ui-20260621" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="supabase-config.js?v=supabase-20260627" defer></script>
+<script src="supabase-client.js?v=auth-flow-20260627" defer></script>
+<script src="authentication-complete.js?v=auth-complete-20260627" defer></script>
+</body>
+</html>

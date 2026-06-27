@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=claude-ui-20260621">
+<link rel="stylesheet" href="style.css?v=combined-auth-20260627">
 </head>
 <body>
 
@@ -23,7 +23,9 @@
       <a href="index.html#industries">Industries</a>
       <a href="about.html">About</a>
     </div>
-    <a class="btn" href="research.html">Try research <span class="arrow">→</span></a>
+    <a class="btn auth-nav-btn" data-auth-action
+       data-auth-href="chatbot.html"
+       href="chatbot.html">Sign up / Log in</a>
   </div>
 </nav>
 
@@ -90,7 +92,7 @@
     </div>
 
     <div style="text-align:center; padding-top:40px; border-top:1px solid var(--line);">
-      <a class="btn" href="research.html">Experience the workflow <span class="arrow">→</span></a>
+      <a class="btn" href="index.html#landing-chat-form">Chat with Sutra <span class="arrow">→</span></a>
     </div>
   </div>
 </section>
@@ -104,6 +106,10 @@
 </footer>
 
 <script src="main.js?v=claude-ui-20260621" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="supabase-config.js?v=supabase-20260627" defer></script>
+<script src="supabase-client.js?v=auth-flow-20260627" defer></script>
+<script src="auth-nav.js?v=auth-flow-20260627" defer></script>
 
 </body>
 </html>

@@ -31,7 +31,7 @@ consumer research report**.
 
 ## Tech stack
 
-FastAPI · PostgreSQL · SQLAlchemy · Pydantic · python-dotenv ·
+FastAPI · Supabase PostgreSQL/Auth · SQLAlchemy · Alembic · Pydantic · python-dotenv ·
 requests + BeautifulSoup · external AI API (OpenAI / OpenRouter / Gemini / Claude).
 
 ---
@@ -40,13 +40,19 @@ requests + BeautifulSoup · external AI API (OpenAI / OpenRouter / Gemini / Clau
 
 ```
 backend/
+  alembic/                       # versioned PostgreSQL schema migrations
+  alembic.ini
   app/
+    auth.py                      # verifies Supabase access tokens
     main.py                       # FastAPI app, CORS, /health, startup
     database.py                   # engine, session, Base, get_db
     models.py                     # businesses + research_reports tables
     schemas.py                    # Pydantic request/response + report shape
     routes/
+      auth.py                     # GET /api/auth/me
+      chat.py                     # owned research conversations
       research.py                 # POST /start, GET /{report_id}
+      waitlist.py                 # public early-access signup
     services/
       scraper_service.py          # requests + BeautifulSoup scraping
       ai_service.py               # OpenAI / Gemini / Claude integration
@@ -72,14 +78,19 @@ pip install -r requirements.txt
 
 # 3. Configure environment
 cp .env.example .env
-#   then edit .env and set DATABASE_URL, AI_PROVIDER, AI_API_KEY, FRONTEND_URL
+#   then edit .env and set DATABASE_URL, Supabase, AI, and frontend values
+
+# 4. Apply versioned database migrations
+alembic upgrade head
 ```
 
 ### Environment variables
 
 | Variable       | Required | Description                                              |
 |----------------|----------|----------------------------------------------------------|
-| `DATABASE_URL` | yes\*    | Postgres connection string. Falls back to local SQLite.  |
+| `DATABASE_URL` | yes\*    | Supabase Session-pooler/PostgreSQL connection string.    |
+| `SUPABASE_URL` | production | Supabase project URL used to verify users.              |
+| `SUPABASE_PUBLISHABLE_KEY` | production | Public client key used by Supabase Auth.      |
 | `AI_PROVIDER`  | yes      | `openai` \| `openrouter` \| `gemini` \| `claude`         |
 | `AI_API_KEY`   | yes      | API key for the chosen provider (never hardcode it).     |
 | `AI_MODEL`     | no       | Override the default model for the provider.             |
@@ -178,12 +189,26 @@ Returns a previously saved report.
 
 ## Database tables
 
-**businesses**: `id`, `business_name`, `industry`, `location`, `description`,
-`website_url`, `instagram_url`, `linkedin_url`, `competitor_urls` (JSON list),
-`created_at`.
+The initial production migration creates:
 
-**research_reports**: `id`, `business_id` (FK), `report_json` (JSON),
-`created_at`.
+- **profiles** — application profile tied to `auth.users`.
+- **businesses** — one business per user in V1.
+- **research_sessions** and **chat_messages** — resumable owned conversations.
+- **research_sources** — submitted URLs, scrape state, extracted text and hashes.
+- **research_reports** — versioned JSON reports linked to businesses and sessions.
+- **waitlist_signups** and **consent_events** — early access and consent history.
+
+All application tables have Row Level Security enabled. Browser code uses
+Supabase for authentication; application data goes through FastAPI, which
+verifies the bearer token and applies ownership checks.
+
+Create future schema changes with Alembic rather than `create_all`:
+
+```bash
+alembic revision --autogenerate -m "describe the change"
+alembic upgrade head
+alembic check
+```
 
 ---
 

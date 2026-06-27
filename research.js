@@ -4,16 +4,31 @@
  *   1. User chooses guided template or open chat, optionally adds a website,
  *      then clicks "Try researching".
  *   2. A mock registration overlay appears.
- *   3. On register, we open a chat session on the backend.
+ *   3. Supabase Auth signs the user in, then we open an owned chat session.
  *   4. If they filled the setup template, we send that as the first message.
  *      The chatbot then stays as a clean standalone conversation window.
  *
- * Auth is mock/prototype: the account lives only in the browser (localStorage),
- * there is no real server-side user. The chat session, however, is real and
- * persisted in the backend SQLite DB.
+ * Supabase manages passwords and browser sessions. FastAPI verifies the access
+ * token and stores research data in PostgreSQL.
  */
 (function () {
   const API_BASE = window.SUTRA_API_URL || "http://127.0.0.1:8000";
+  const supabaseClient =
+    window.supabase &&
+    window.SUTRA_SUPABASE_URL &&
+    window.SUTRA_SUPABASE_PUBLISHABLE_KEY
+      ? window.supabase.createClient(
+          window.SUTRA_SUPABASE_URL,
+          window.SUTRA_SUPABASE_PUBLISHABLE_KEY,
+          {
+            auth: {
+              persistSession: true,
+              autoRefreshToken: true,
+              detectSessionInUrl: true,
+            },
+          }
+        )
+      : null;
 
   // --- element handles ----------------------------------------------------
   const websiteGate = document.getElementById("website-gate");
@@ -27,6 +42,9 @@
   const authOverlay = document.getElementById("auth-overlay");
   const authForm = document.getElementById("auth-form");
   const authClose = document.getElementById("auth-close");
+  const authError = document.getElementById("auth-error");
+  const navUserTag = document.getElementById("nav-user-tag");
+  const navLogout = document.getElementById("nav-logout");
 
   const chatSection = document.getElementById("chat-section");
   const chatUserTag = document.getElementById("chat-user-tag");
@@ -35,6 +53,19 @@
   const input = document.getElementById("chat-input");
   const sendBtn = document.getElementById("chat-send");
   const errorEl = document.getElementById("chat-error");
+  const dashboardAction = document.getElementById("dashboard-action");
+  const generateDashboardBtn = document.getElementById("generate-dashboard");
+  const dashboardSection = document.getElementById("business-dashboard");
+  const dashboardHeadline = document.getElementById("dashboard-headline");
+  const targetingSummary = document.getElementById("targeting-summary");
+  const targetingScore = document.getElementById("targeting-score");
+  const audienceSegments = document.getElementById("audience-segments");
+  const marketSummary = document.getElementById("market-summary");
+  const recommendations = document.getElementById("recommendations");
+  const engagementPatterns = document.getElementById("engagement-patterns");
+  const behavioralTrends = document.getElementById("behavioral-trends");
+  const marketOpportunities = document.getElementById("market-opportunities");
+  const completeReport = document.getElementById("complete-report");
 
   if (!websiteGate) return;
 
@@ -44,6 +75,9 @@
     { key: "industry", label: "Industry", placeholder: "e.g. Fashion & Apparel", required: false },
     { key: "location", label: "Location / target market", placeholder: "e.g. Surat, selling across India", required: false },
     { key: "price_range", label: "Price range", placeholder: "e.g. Rs. 800-2500", required: false },
+    { key: "current_customers", label: "Who buys from you today?", placeholder: "e.g. College students, young professionals", required: false },
+    { key: "channels", label: "Where do customers find you?", placeholder: "e.g. Instagram, WhatsApp, referrals", required: false },
+    { key: "customer_signals", label: "Any customer signals?", placeholder: "e.g. Repeat purchases, common questions", required: false },
     { key: "competitors", label: "Competitors", placeholder: "Names or URLs, comma separated", required: false },
     { key: "goal", label: "Research goal", placeholder: "e.g. Find my core audience and ad angles", required: false },
   ];
@@ -51,12 +85,15 @@
   // --- state --------------------------------------------------------------
   const state = {
     user: null, // { name, email }
+    authSession: null,
     website: "",
     sessionId: null,
+    stage: "intake",
     templateFields: [],
     setupMode: "template",
     pendingInitialMessage: "",
     busy: false,
+    generatingDashboard: false,
   };
 
   // =======================================================================
@@ -70,7 +107,7 @@
     });
   });
 
-  websiteGate.addEventListener("submit", (event) => {
+  websiteGate.addEventListener("submit", async (event) => {
     event.preventDefault();
     hideSetupError();
     state.website = (websiteInput.value || "").trim();
@@ -82,6 +119,12 @@
       return;
     }
 
+    const existingSession = await getActiveSession();
+    if (existingSession) {
+      setAuthenticatedSession(existingSession);
+      await startChat();
+      return;
+    }
     openAuth();
   });
 
@@ -142,8 +185,9 @@
 
     if (!lines.length) return "";
     return (
-      "Here are my business details. Please give me an estimated audience " +
-      "research breakdown.\n\n" +
+      "Here are my business details. Please use this as intake context for my " +
+      "personalised business dashboard. If something important is missing, ask " +
+      "me the most useful follow-up question.\n\n" +
       lines.join("\n")
     );
   }
@@ -174,24 +218,133 @@
   });
 
   // =======================================================================
-  // STEP 3 — mock registration -> start chat session
+  // STEP 3 — real Supabase sign-up/sign-in -> start owned chat session
   // =======================================================================
   authForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const name = document.getElementById("reg_name").value.trim();
     const email = document.getElementById("reg_email").value.trim();
+    const password = document.getElementById("reg_password").value;
+    const submitButton = authForm.querySelector('button[type="submit"]');
 
-    state.user = { name, email };
-    // Persist the mock account locally so a refresh keeps them "registered".
-    try {
-      localStorage.setItem("sutra_user", JSON.stringify(state.user));
-    } catch (_) {
-      /* localStorage may be blocked on file:// — non-fatal */
+    hideAuthError();
+    if (!supabaseClient) {
+      showAuthError("Authentication could not load. Refresh the page and try again.");
+      return;
     }
 
-    closeAuth();
-    await startChat();
+    submitButton.disabled = true;
+    submitButton.textContent = "Signing in...";
+
+    try {
+      // Existing users sign in. If the account does not exist yet, create it.
+      let result = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (result.error) {
+        result = await supabaseClient.auth.signUp({
+          email,
+          password,
+          options: { data: { full_name: name } },
+        });
+      }
+      if (result.error) throw result.error;
+      if (!result.data.session) {
+        showAuthError(
+          "Check your email to confirm the account, then return here and continue."
+        );
+        return;
+      }
+
+      setAuthenticatedSession(result.data.session, name);
+      closeAuth();
+      await startChat();
+    } catch (error) {
+      showAuthError(error.message || "Could not sign in. Please try again.");
+    } finally {
+      submitButton.disabled = false;
+      submitButton.innerHTML =
+        'Continue to research <span class="arrow">→</span>';
+    }
   });
+
+  function showAuthError(message) {
+    authError.textContent = message;
+    authError.hidden = false;
+  }
+
+  function hideAuthError() {
+    authError.hidden = true;
+  }
+
+  async function getActiveSession() {
+    if (!supabaseClient) return null;
+    const { data, error } = await supabaseClient.auth.getSession();
+    return error ? null : data.session;
+  }
+
+  function setAuthenticatedSession(session, fallbackName = "") {
+    state.authSession = session;
+    const authUser = session.user;
+    state.user = {
+      name: authUser.user_metadata?.full_name || fallbackName,
+      email: authUser.email || "",
+    };
+    navUserTag.textContent = state.user.name || state.user.email;
+    navUserTag.hidden = false;
+    navLogout.hidden = false;
+  }
+
+  function clearAuthenticatedSession() {
+    state.authSession = null;
+    state.user = null;
+    state.sessionId = null;
+    state.stage = "intake";
+    state.pendingInitialMessage = "";
+    state.busy = false;
+    state.generatingDashboard = false;
+    chatSection.hidden = true;
+    dashboardSection.hidden = true;
+    dashboardAction.hidden = true;
+    messagesEl.replaceChildren();
+    input.disabled = false;
+    sendBtn.disabled = false;
+    generateDashboardBtn.disabled = false;
+    generateDashboardBtn.innerHTML =
+      'Generate dashboard <span class="arrow">→</span>';
+    navUserTag.textContent = "";
+    navUserTag.hidden = true;
+    navLogout.hidden = true;
+  }
+
+  navLogout.addEventListener("click", async () => {
+    if (!supabaseClient) return;
+    navLogout.disabled = true;
+    navLogout.textContent = "Logging out...";
+    try {
+      const { error } = await supabaseClient.auth.signOut({ scope: "local" });
+      if (error) throw error;
+      clearAuthenticatedSession();
+      document.getElementById("start").scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    } catch (error) {
+      showSetupError(error.message || "Could not log out. Please try again.");
+    } finally {
+      navLogout.disabled = false;
+      navLogout.textContent = "Log out";
+    }
+  });
+
+  async function apiFetch(path, options = {}) {
+    const session = await getActiveSession();
+    if (!session) {
+      throw new Error("Your session expired. Sign in again to continue.");
+    }
+    setAuthenticatedSession(session);
+    const headers = new Headers(options.headers || {});
+    headers.set("Authorization", `Bearer ${session.access_token}`);
+    return fetch(`${API_BASE}${path}`, { ...options, headers });
+  }
 
   // =======================================================================
   // STEP 4 — open the chat session and reveal the UI
@@ -207,7 +360,7 @@
     addTypingBubble();
 
     try {
-      const res = await fetch(`${API_BASE}/api/chat/start`, {
+      const res = await apiFetch("/api/chat/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -222,6 +375,7 @@
       if (!res.ok) throw new Error(data.detail || `Backend returned ${res.status}.`);
 
       state.sessionId = data.session_id;
+      updateStage(data.stage || "intake");
       addMessage("assistant", data.greeting);
       if (state.pendingInitialMessage) {
         await sendMessage(state.pendingInitialMessage);
@@ -265,7 +419,7 @@
     addTypingBubble();
 
     try {
-      const res = await fetch(`${API_BASE}/api/chat/message`, {
+      const res = await apiFetch("/api/chat/message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ session_id: state.sessionId, message: text }),
@@ -273,6 +427,7 @@
       const data = await res.json().catch(() => ({}));
       removeTypingBubble();
       if (!res.ok) throw new Error(data.detail || `Backend returned ${res.status}.`);
+      updateStage(data.stage || state.stage);
       addMessage("assistant", data.reply);
     } catch (error) {
       removeTypingBubble();
@@ -282,9 +437,126 @@
     }
   }
 
+  generateDashboardBtn.addEventListener("click", generateDashboard);
+
+  async function generateDashboard() {
+    if (state.busy || state.generatingDashboard || !state.sessionId) return;
+    hideError();
+    state.generatingDashboard = true;
+    generateDashboardBtn.disabled = true;
+    generateDashboardBtn.textContent = "Generating...";
+
+    try {
+      const res = await apiFetch(`/api/chat/${state.sessionId}/generate-report`, {
+        method: "POST",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.detail || `Backend returned ${res.status}.`);
+
+      updateStage(data.stage || "report_generated");
+      renderDashboard(data.report_json || {});
+      addMessage("assistant", "Your dashboard is ready below. Treat it as an estimated strategy snapshot, then validate the important parts with real customer data.");
+    } catch (error) {
+      showError(friendlyError(error));
+      generateDashboardBtn.disabled = false;
+      generateDashboardBtn.innerHTML = 'Generate dashboard <span class="arrow">→</span>';
+    } finally {
+      state.generatingDashboard = false;
+    }
+  }
+
   // =======================================================================
   // UI helpers
   // =======================================================================
+  function updateStage(stage) {
+    state.stage = stage || state.stage;
+    const canGenerate = ["ready_for_report", "report_generated"].includes(state.stage);
+    dashboardAction.hidden = !canGenerate;
+    if (state.stage === "report_generated") {
+      generateDashboardBtn.disabled = true;
+      generateDashboardBtn.textContent = "Dashboard generated";
+    }
+  }
+
+  function renderDashboard(report) {
+    dashboardSection.hidden = false;
+    dashboardHeadline.textContent =
+      report.dashboard_headline || "Your audience and market intelligence dashboard";
+    targetingSummary.textContent =
+      report.targeting_effectiveness_summary ||
+      report.target_audience_overview ||
+      "Sutra generated an estimated view of how your business can target its likely customers.";
+
+    const score = Number(report.targeting_score);
+    targetingScore.textContent = Number.isFinite(score) ? `${Math.round(score)}/100` : "--";
+
+    renderList(audienceSegments, report.key_audience_segments, [
+      report.primary_segment,
+      report.secondary_segment,
+    ]);
+    marketSummary.textContent =
+      report.market_opportunity_summary ||
+      report.target_audience_overview ||
+      "More market context is needed to summarise the strongest opportunity.";
+    renderList(recommendations, report.actionable_recommendations, report.campaign_angles);
+    renderList(engagementPatterns, report.engagement_patterns, report.best_marketing_channels);
+    renderList(behavioralTrends, report.behavioral_trends, [report.behavioral_analysis]);
+    renderList(marketOpportunities, report.market_opportunities, report.buying_motivations);
+    renderCompleteReport(report);
+
+    dashboardSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function renderList(container, primaryItems, fallbackItems) {
+    const items = normaliseItems(primaryItems).length
+      ? normaliseItems(primaryItems)
+      : normaliseItems(fallbackItems);
+    container.replaceChildren();
+    const list = document.createElement("ul");
+    list.className = "dashboard-list";
+    (items.length ? items : ["Not enough information yet. Add more business context in chat."]).forEach((item) => {
+      const li = document.createElement("li");
+      li.textContent = item;
+      list.append(li);
+    });
+    container.append(list);
+  }
+
+  function renderCompleteReport(report) {
+    const sections = [
+      ["Business summary", report.business_summary],
+      ["Audience overview", report.target_audience_overview],
+      ["Demographic analysis", report.demographic_analysis],
+      ["Socioeconomic analysis", report.socioeconomic_analysis],
+      ["Behavioural analysis", report.behavioral_analysis],
+      ["Buying motivations", normaliseItems(report.buying_motivations).join(", ")],
+      ["Pain points", normaliseItems(report.pain_points).join(", ")],
+      ["Best marketing channels", normaliseItems(report.best_marketing_channels).join(", ")],
+      ["Campaign angles", normaliseItems(report.campaign_angles).join(", ")],
+      ["Confidence", report.confidence_score],
+      ["Missing information", normaliseItems(report.missing_information).join(", ")],
+      ["Recommended follow-ups", normaliseItems(report.recommended_follow_up_questions).join(", ")],
+    ].filter(([, value]) => value);
+
+    completeReport.replaceChildren();
+    sections.forEach(([label, value]) => {
+      const block = document.createElement("div");
+      block.className = "report-block";
+      const h3 = document.createElement("h3");
+      h3.textContent = label;
+      const p = document.createElement("p");
+      p.textContent = value;
+      block.append(h3, p);
+      completeReport.append(block);
+    });
+  }
+
+  function normaliseItems(value) {
+    if (Array.isArray(value)) return value.filter(Boolean).map(String);
+    if (value) return [String(value)];
+    return [];
+  }
+
   function addMessage(role, text) {
     const row = document.createElement("div");
     row.className = `chat-msg chat-msg-${role}`;
@@ -337,12 +609,22 @@
     return error.message || "Something went wrong. Check the backend terminal.";
   }
 
-  // If the user already "registered" earlier (this browser), remember it but
-  // still require the explicit "Try researching" click to open the chat.
-  try {
-    const saved = localStorage.getItem("sutra_user");
-    if (saved) state.user = JSON.parse(saved);
-  } catch (_) {
-    /* ignore */
+  // Supabase persists the browser session and refreshes its access token.
+  if (supabaseClient) {
+    supabaseClient.auth.getSession().then(({ data }) => {
+      if (!data.session) return;
+      setAuthenticatedSession(data.session);
+    });
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT" || !session) {
+        clearAuthenticatedSession();
+      } else if (
+        event === "SIGNED_IN" ||
+        event === "TOKEN_REFRESHED" ||
+        event === "USER_UPDATED"
+      ) {
+        setAuthenticatedSession(session);
+      }
+    });
   }
 })();

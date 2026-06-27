@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=claude-ui-20260621">
+<link rel="stylesheet" href="style.css?v=full-page-20260627">
 </head>
 <body>
 
@@ -23,7 +23,9 @@
       <a href="index.html#industries">Industries</a>
       <a href="about.html">About</a>
     </div>
-    <a class="btn" href="research.html">Try research <span class="arrow">→</span></a>
+    <a class="btn auth-nav-btn" data-auth-action
+       data-auth-href="chatbot.html"
+       href="chatbot.html">Sign up / Log in</a>
   </div>
 </nav>
 
@@ -50,11 +52,32 @@
       — without the agency bill or the tool sprawl.
     </p>
 
-    <div class="cta-row hero-animate hero-animate-4">
-      <a class="btn" href="research.html">Start research <span class="arrow">→</span></a>
-      <a class="btn ghost" href="#how">See how it works</a>
+    <form class="landing-chat-entry hero-animate hero-animate-4"
+          id="landing-chat-form" action="chatbot.html" method="get"
+          target="_blank">
+      <label class="sr-only" for="landing-chat-input">Ask Sutra about your business</label>
+      <textarea id="landing-chat-input" rows="3"
+                placeholder="Tell Sutra about your business, customers, or marketing goal…"></textarea>
+      <button class="btn landing-chat-send" type="submit">
+        Ask Sutra <span class="arrow">↗</span>
+      </button>
+    </form>
+    <div class="landing-chat-suggestions hero-animate hero-animate-4">
+      <span>Or start with</span>
+      <a href="chatbot.html" target="_blank" rel="noopener"
+         data-chat-suggestion="Help me identify the strongest audience for my business.">
+        Find my core audience <span>›</span>
+      </a>
+      <a href="chatbot.html" target="_blank" rel="noopener"
+         data-chat-suggestion="Help me understand why customers would choose my product over competitors.">
+        Sharpen my positioning <span>›</span>
+      </a>
+      <a href="chatbot.html" target="_blank" rel="noopener"
+         data-chat-suggestion="Give me campaign angles based on my product and likely buyers.">
+        Build campaign angles <span>›</span>
+      </a>
     </div>
-    <p class="cta-nocard hero-animate hero-animate-4">No credit card required</p>
+    <p class="cta-nocard hero-animate hero-animate-4">Free to start · Your research stays saved</p>
   </div>
 </section>
 
@@ -681,10 +704,11 @@
   <div class="wrap inner">
     <div class="kicker">Limited beta · First 100 brands onboard free</div>
     <h2>Stop guessing.<br/>Start <em>growing.</em></h2>
-    <form class="signup" onsubmit="event.preventDefault(); this.querySelector('button').innerHTML='You\u2019re in <span class=\u0027arrow\u0027>✓</span>'; this.querySelector('input').value='';">
-      <input type="email" required placeholder="your@business.in" />
+    <form class="signup" data-waitlist-form>
+      <input name="email" type="email" required placeholder="your@business.in" />
       <button type="submit" class="btn">Join waitlist <span class="arrow">→</span></button>
     </form>
+    <p data-waitlist-status></p>
     <div class="final-meta">
       <span>Free forever tier</span>
       <span>No credit card</span>
@@ -702,6 +726,12 @@
 </footer>
 
 <script src="main.js?v=claude-ui-20260621" defer></script>
+<script src="waitlist.js?v=database-20260627" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="supabase-config.js?v=supabase-20260627" defer></script>
+<script src="supabase-client.js?v=auth-flow-20260627" defer></script>
+<script src="auth-nav.js?v=auth-flow-20260627" defer></script>
+<script src="landing-chat.js?v=new-tab-20260627" defer></script>
 
 </body>
 </html>

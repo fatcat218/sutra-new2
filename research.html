@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=claude-ui-20260621">
+<link rel="stylesheet" href="style.css?v=session-20260627">
 </head>
 <body class="research-page">
 
@@ -22,7 +22,11 @@
       <a href="index.html#industries">Industries</a>
       <a href="about.html">About</a>
     </div>
-    <a class="btn" href="#start">Start research <span class="arrow">→</span></a>
+    <div class="nav-account">
+      <span class="nav-user-tag" id="nav-user-tag" hidden></span>
+      <button class="nav-logout" id="nav-logout" type="button" hidden>Log out</button>
+      <a class="btn" href="#start">Start research <span class="arrow">→</span></a>
+    </div>
   </div>
 </nav>
 
@@ -87,7 +91,7 @@
 
         <div class="research-trust hero-animate hero-animate-4">
           <span>Estimated, not claimed fact</span>
-          <span>Conversation saved locally</span>
+          <span>Conversation saved securely</span>
           <span>Powered by OpenRouter</span>
         </div>
       </div>
@@ -141,9 +145,83 @@
               <span class="arrow">→</span>
             </button>
           </form>
+          <div class="dashboard-action" id="dashboard-action" hidden>
+            <div>
+              <span class="form-step">Dashboard ready</span>
+              <p>Sutra has enough business context to build your audience and market-intelligence dashboard.</p>
+            </div>
+            <button class="btn" type="button" id="generate-dashboard">
+              Generate dashboard <span class="arrow">→</span>
+            </button>
+          </div>
           <p class="chat-error" id="chat-error" hidden></p>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================
+       STEP 5 — Personalised dashboard (hidden until generated)
+  ==================================================================== -->
+  <section class="business-dashboard section" id="business-dashboard" hidden>
+    <div class="wrap">
+      <div class="section-head research-section-head">
+        <div>
+          <div class="section-label">Home dashboard</div>
+          <h2 class="section-title">Your business <em>snapshot.</em></h2>
+        </div>
+        <p class="section-aside">Estimated insights. Validate with real customer conversations.</p>
+      </div>
+
+      <div class="dashboard-hero-card">
+        <div>
+          <span class="form-step">Targeting effectiveness</span>
+          <h3 id="dashboard-headline">Dashboard generated</h3>
+          <p id="targeting-summary"></p>
+        </div>
+        <div class="score-card">
+          <span id="targeting-score">--</span>
+          <small>targeting clarity score</small>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <article class="dashboard-card">
+          <span class="dashboard-icon">◎</span>
+          <h3>Key audience segments</h3>
+          <div id="audience-segments"></div>
+        </article>
+        <article class="dashboard-card">
+          <span class="dashboard-icon">✦</span>
+          <h3>Market opportunity summary</h3>
+          <p id="market-summary"></p>
+        </article>
+        <article class="dashboard-card">
+          <span class="dashboard-icon">✓</span>
+          <h3>Actionable recommendations</h3>
+          <div id="recommendations"></div>
+        </article>
+        <article class="dashboard-card">
+          <span class="dashboard-icon">↗</span>
+          <h3>Engagement patterns</h3>
+          <div id="engagement-patterns"></div>
+        </article>
+        <article class="dashboard-card">
+          <span class="dashboard-icon">◌</span>
+          <h3>Behavioural trends</h3>
+          <div id="behavioral-trends"></div>
+        </article>
+        <article class="dashboard-card">
+          <span class="dashboard-icon">◇</span>
+          <h3>Market opportunities</h3>
+          <div id="market-opportunities"></div>
+        </article>
+      </div>
+
+      <article class="complete-report-card">
+        <div class="section-label">Complete research report</div>
+        <div id="complete-report"></div>
+      </article>
     </div>
   </section>
 </main>
@@ -172,14 +250,17 @@
                placeholder="Choose a password">
       </label>
       <button class="btn btn-block" type="submit">
-        Create account &amp; open chat <span class="arrow">→</span>
+        Continue to research <span class="arrow">→</span>
       </button>
-      <p class="auth-fineprint">Prototype only — accounts are not stored on a server.</p>
+      <p class="chat-error" id="auth-error" hidden></p>
+      <p class="auth-fineprint">Your account and research history are saved securely.</p>
     </form>
   </div>
 </div>
 
 <script src="main.js?v=claude-ui-20260621" defer></script>
-<script src="research.js?v=claude-ui-20260621" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="supabase-config.js?v=supabase-20260627" defer></script>
+<script src="research.js?v=session-20260627" defer></script>
 </body>
 </html>

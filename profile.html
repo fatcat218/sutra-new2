@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your account — Sutra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=account-profile-20260627">
+</head>
+<body class="profile-page">
+
+<canvas id="ring-grid" aria-hidden="true"></canvas>
+
+<nav>
+  <div class="wrap inner">
+    <a class="logo" href="index.html"><span>Sutra</span><span class="dot"></span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="chatbot.html">Chat with Sutra</a>
+    </div>
+    <a class="btn ghost" href="chatbot.html">Back to chat <span class="arrow">→</span></a>
+  </div>
+</nav>
+
+<main class="profile-page-main wrap" id="profile-page-main" hidden>
+  <aside class="profile-side">
+    <div class="profile-identity">
+      <span class="profile-avatar" id="profile-avatar">U</span>
+      <div>
+        <b id="profile-side-name">Your account</b>
+        <span id="profile-side-email"></span>
+      </div>
+    </div>
+    <nav class="profile-side-nav" aria-label="Account navigation">
+      <a class="is-active" href="#account-overview">Account overview</a>
+      <a href="#preferences">Preferences</a>
+      <a href="#data-privacy">Data &amp; privacy</a>
+      <a href="chatbot.html">Chat with Sutra</a>
+    </nav>
+  </aside>
+
+  <div class="profile-content">
+    <header class="profile-heading" id="account-overview">
+      <div class="section-label">Account dashboard</div>
+      <h1>Your Sutra <em>profile.</em></h1>
+      <p>Manage the preferences and data connected to your account.</p>
+    </header>
+
+    <p class="profile-status-banner" id="profile-status-banner" hidden></p>
+    <p class="profile-feedback" id="profile-feedback" hidden></p>
+
+    <section class="profile-card">
+      <div class="profile-card-heading">
+        <div>
+          <span class="form-step">Profile</span>
+          <h2>Account details</h2>
+        </div>
+      </div>
+      <dl class="profile-details">
+        <div><dt>Name</dt><dd id="profile-name">—</dd></div>
+        <div><dt>Email</dt><dd id="profile-email">—</dd></div>
+        <div><dt>Member since</dt><dd id="profile-created">—</dd></div>
+        <div><dt>Account status</dt><dd id="profile-status">—</dd></div>
+      </dl>
+    </section>
+
+    <section class="profile-card" id="preferences">
+      <div class="profile-card-heading">
+        <div>
+          <span class="form-step">Preferences</span>
+          <h2>Language preference</h2>
+        </div>
+        <p>Sutra will use this as the preferred language for future conversations.</p>
+      </div>
+      <form class="profile-language-form" id="profile-language-form">
+        <label class="field" for="profile-language">
+          <span>Preferred language</span>
+          <select id="profile-language">
+            <option value="en">English</option>
+            <option value="hi">Hindi — हिन्दी</option>
+            <option value="bn">Bengali — বাংলা</option>
+            <option value="ta">Tamil — தமிழ்</option>
+            <option value="te">Telugu — తెలుగు</option>
+            <option value="mr">Marathi — मराठी</option>
+            <option value="gu">Gujarati — ગુજરાતી</option>
+            <option value="kn">Kannada — ಕನ್ನಡ</option>
+            <option value="ml">Malayalam — മലയാളം</option>
+            <option value="pa">Punjabi — ਪੰਜਾਬੀ</option>
+          </select>
+        </label>
+        <button class="btn" type="submit">Save preference</button>
+      </form>
+    </section>
+
+    <section class="profile-card" id="data-privacy">
+      <div class="profile-card-heading">
+        <div>
+          <span class="form-step">Data &amp; privacy</span>
+          <h2>Research history</h2>
+        </div>
+      </div>
+      <div class="profile-action-row">
+        <div>
+          <b>Clear all research history</b>
+          <p>Deletes conversations, messages, captured sources, and generated reports. Your account remains active.</p>
+        </div>
+        <button class="profile-secondary-button" id="clear-history-button" type="button">
+          Clear history
+        </button>
+      </div>
+    </section>
+
+    <section class="profile-card profile-danger-card">
+      <div class="profile-card-heading">
+        <div>
+          <span class="form-step">Account control</span>
+          <h2>Account access</h2>
+        </div>
+      </div>
+      <div class="profile-action-row">
+        <div>
+          <b>Log me out</b>
+          <p>Ends the Sutra session on this browser.</p>
+        </div>
+        <button class="profile-secondary-button" id="profile-logout-button" type="button">
+          Log out
+        </button>
+      </div>
+      <div class="profile-action-row">
+        <div>
+          <b>Request account deletion</b>
+          <p>Records a deletion request for review. This does not immediately erase the account.</p>
+        </div>
+        <button class="profile-danger-button" id="delete-account-button" type="button">
+          Request deletion
+        </button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div class="chatbot-auth-loading" id="profile-loading">
+  <span class="dot-typing"></span><span class="dot-typing"></span><span class="dot-typing"></span>
+</div>
+
+<div class="account-confirmation" id="account-confirmation" hidden>
+  <div class="account-confirmation-card" role="dialog" aria-modal="true"
+       aria-labelledby="account-confirmation-title">
+    <span class="form-step">Please confirm</span>
+    <h2 id="account-confirmation-title"></h2>
+    <p id="account-confirmation-message"></p>
+    <div>
+      <button class="profile-secondary-button" id="account-confirmation-cancel"
+              type="button">Cancel</button>
+      <button class="profile-danger-button" id="account-confirmation-accept"
+              type="button">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script src="main.js?v=claude-ui-20260621" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="supabase-config.js?v=supabase-20260627" defer></script>
+<script src="supabase-client.js?v=auth-flow-20260627" defer></script>
+<script src="profile.js?v=account-profile-20260627" defer></script>
+</body>
+</html>

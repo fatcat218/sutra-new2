@@ -15,6 +15,7 @@ import requests
 from sqlalchemy.orm import Session
 
 from app import models, schemas
+from app.auth import get_current_profile
 from app.database import get_db
 from app.services import research_service
 
@@ -25,6 +26,7 @@ router = APIRouter(prefix="/api/research", tags=["research"])
 def start_research(
     payload: schemas.ResearchStartRequest,
     db: Session = Depends(get_db),
+    profile: models.Profile = Depends(get_current_profile),
 ):
     """
     Accept business details + optional URLs, validate, scrape, call the AI,
@@ -33,7 +35,11 @@ def start_research(
     Pydantic already enforced "description OR >=1 URL" before we get here.
     """
     try:
-        business, report, report_data = research_service.run_research(db, payload)
+        business, report, report_data = research_service.run_research(
+            db,
+            payload,
+            profile.id,
+        )
     except RuntimeError as exc:
         # Misconfiguration or AI/parse failure -> 502 (upstream/our config issue).
         raise HTTPException(status_code=502, detail=str(exc))
@@ -51,11 +57,22 @@ def start_research(
 
 
 @router.get("/{report_id}", response_model=schemas.ReportResponse)
-def get_report(report_id: int, db: Session = Depends(get_db)):
+def get_report(
+    report_id: int,
+    db: Session = Depends(get_db),
+    profile: models.Profile = Depends(get_current_profile),
+):
     """Return a previously generated research report by its id."""
-    report = db.query(models.ResearchReport).filter(
-        models.ResearchReport.id == report_id
-    ).first()
+    report = (
+        db.query(models.ResearchReport)
+        .join(models.Business)
+        .filter(
+            models.ResearchReport.id == report_id,
+            models.Business.user_id == profile.id,
+            models.ResearchReport.status == "complete",
+        )
+        .first()
+    )
 
     if report is None:
         raise HTTPException(status_code=404, detail="Report not found.")

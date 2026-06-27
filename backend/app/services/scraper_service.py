@@ -20,7 +20,9 @@ Any failure returns "" so research/chat never crashes because of scraping.
 from __future__ import annotations
 
 import json
+import ipaddress
 import re
+import socket
 from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import Iterable
@@ -151,12 +153,26 @@ def _scrape_website_uncached(url: str) -> str:
 
 def _fetch_html(url: str) -> tuple[str, str]:
     try:
-        response = requests.get(
-            url,
-            headers=_HEADERS,
-            timeout=_TIMEOUT_SECONDS,
-            allow_redirects=True,
-        )
+        current_url = url
+        response = None
+        for _ in range(6):
+            safe_url = _normalise_url(current_url)
+            if not safe_url:
+                return "", current_url
+            response = requests.get(
+                safe_url,
+                headers=_HEADERS,
+                timeout=_TIMEOUT_SECONDS,
+                allow_redirects=False,
+            )
+            if response.status_code not in (301, 302, 303, 307, 308):
+                break
+            location = response.headers.get("location")
+            if not location:
+                return "", safe_url
+            current_url = urljoin(safe_url, location)
+        if response is None:
+            return "", url
         response.raise_for_status()
     except Exception:
         return "", url
@@ -372,9 +388,43 @@ def _normalise_url(url: str | None) -> str:
         value = "https://" + value
 
     parsed = urlparse(value)
-    if not parsed.netloc:
+    if (
+        parsed.scheme not in ("http", "https")
+        or not parsed.netloc
+        or not parsed.hostname
+        or parsed.username
+        or parsed.password
+    ):
+        return ""
+    try:
+        if parsed.port and parsed.port not in (80, 443):
+            return ""
+    except ValueError:
+        return ""
+    if not _is_public_hostname(parsed.hostname):
         return ""
     return _canonical_url(value)
+
+
+@lru_cache(maxsize=512)
+def _is_public_hostname(hostname: str) -> bool:
+    """Reject local/private/reserved destinations before making HTTP requests."""
+    lowered = hostname.rstrip(".").lower()
+    if lowered in ("localhost", "localhost.localdomain") or lowered.endswith(".local"):
+        return False
+    try:
+        addresses = {
+            item[4][0]
+            for item in socket.getaddrinfo(lowered, None, type=socket.SOCK_STREAM)
+        }
+    except (socket.gaierror, UnicodeError):
+        return False
+    if not addresses:
+        return False
+    try:
+        return all(ipaddress.ip_address(address).is_global for address in addresses)
+    except ValueError:
+        return False
 
 
 def _canonical_url(url: str) -> str:
