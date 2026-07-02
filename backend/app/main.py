@@ -19,7 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from app.database import engine, init_db
-from app.routes import chat, research
+from app.routes import auth, chat, research, waitlist
 from app.schemas import HealthResponse
 
 app = FastAPI(
@@ -61,6 +61,10 @@ def _on_startup():
 app.include_router(research.router)
 # Mount the chatbot routes (POST /api/chat/start, /api/chat/message, ...).
 app.include_router(chat.router)
+# Supabase-authenticated account endpoint (GET /api/auth/me).
+app.include_router(auth.router)
+# Public early-access form endpoint (POST /api/waitlist).
+app.include_router(waitlist.router)
 
 
 @app.get("/health", response_model=HealthResponse, tags=["health"])

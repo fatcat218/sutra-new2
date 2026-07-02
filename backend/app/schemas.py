@@ -13,7 +13,8 @@ Three groups:
 """
 
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Literal, Optional
+from uuid import UUID
 
 from pydantic import BaseModel, Field, HttpUrl, model_validator
 
@@ -66,6 +67,16 @@ class ResearchReportData(BaseModel):
     coerced rather than rejected.
     """
 
+    dashboard_headline: Optional[str] = None
+    targeting_effectiveness_summary: Optional[str] = None
+    targeting_score: Optional[float] = Field(None, ge=0, le=100)
+    key_audience_segments: List[str] = Field(default_factory=list)
+    market_opportunity_summary: Optional[str] = None
+    actionable_recommendations: List[str] = Field(default_factory=list)
+    engagement_patterns: List[str] = Field(default_factory=list)
+    behavioral_trends: List[str] = Field(default_factory=list)
+    market_opportunities: List[str] = Field(default_factory=list)
+
     business_summary: Optional[str] = None
     target_audience_overview: Optional[str] = None
     primary_segment: Optional[str] = None
@@ -109,6 +120,56 @@ class HealthResponse(BaseModel):
     database: str
 
 
+class AuthMeResponse(BaseModel):
+    id: UUID
+    email: str
+    full_name: Optional[str] = None
+    language_preference: str
+    status: str
+    deletion_requested_at: Optional[datetime] = None
+    created_at: datetime
+
+
+SupportedLanguage = Literal["en", "hi", "bn", "ta", "te", "mr", "gu", "kn", "ml", "pa"]
+
+
+class AccountPreferenceUpdateRequest(BaseModel):
+    language_preference: SupportedLanguage
+
+
+class AccountActionResponse(BaseModel):
+    status: str
+    message: str
+
+
+class HistoryClearResponse(AccountActionResponse):
+    deleted_sessions: int
+    deleted_messages: int
+    deleted_sources: int
+    deleted_reports: int
+
+
+class WaitlistSignupRequest(BaseModel):
+    full_name: Optional[str] = Field(None, max_length=255)
+    email: str = Field(..., min_length=3, max_length=320)
+    company_website: Optional[HttpUrl] = None
+    marketing_consent: bool = False
+    policy_version: str = Field("privacy-v1", min_length=1, max_length=64)
+
+    @model_validator(mode="after")
+    def _validate_email_shape(self):
+        value = self.email.strip()
+        if "@" not in value or value.startswith("@") or value.endswith("@"):
+            raise ValueError("Enter a valid email address.")
+        return self
+
+
+class WaitlistSignupResponse(BaseModel):
+    signup_id: int
+    status: str
+    message: str
+
+
 # --------------------------------------------------------------------------- #
 # 4. CHATBOT
 # --------------------------------------------------------------------------- #
@@ -120,11 +181,13 @@ class ChatTemplateField(BaseModel):
 
 
 class ChatStartRequest(BaseModel):
-    """Open a new chat session. All fields optional (mock auth)."""
+    """Open a research session for the authenticated user."""
 
+    # Kept temporarily for backwards-compatible clients. The backend ignores
+    # these identity fields and always trusts the verified Supabase token.
     user_email: Optional[str] = Field(None, max_length=255)
     user_name: Optional[str] = Field(None, max_length=255)
-    website_url: Optional[str] = Field(None, max_length=512)
+    website_url: Optional[str] = Field(None, max_length=2048)
     mode: Optional[str] = Field(None, max_length=32)  # "template" | "free"
 
 
@@ -140,6 +203,7 @@ class ChatStartResponse(BaseModel):
     session_id: int
     greeting: str
     template_fields: List[ChatTemplateField]
+    stage: str = "intake"  # current conversation stage (Feature 1)
 
 
 class ChatSendRequest(BaseModel):
@@ -150,8 +214,78 @@ class ChatSendRequest(BaseModel):
 class ChatSendResponse(BaseModel):
     session_id: int
     reply: str
+    stage: str = "clarifying"  # updated conversation stage (Feature 1)
 
 
 class ChatHistoryResponse(BaseModel):
     session_id: int
     messages: List[ChatMessageItem]
+
+
+class ChatSessionSummary(BaseModel):
+    session_id: int
+    title: str
+    stage: str
+    status: str
+    created_at: datetime
+    updated_at: datetime
+    # Research Library metadata (optional so older clients are unaffected).
+    message_count: int = 0
+    preview: Optional[str] = None
+    report_id: Optional[int] = None
+    report_status: Optional[str] = None
+    source_count: int = 0
+
+
+class ChatSessionsResponse(BaseModel):
+    sessions: List[ChatSessionSummary]
+
+
+class SessionRenameRequest(BaseModel):
+    title: str = Field(..., min_length=1, max_length=255)
+
+
+class SessionDeleteResponse(BaseModel):
+    status: str
+    session_id: int
+    deleted_messages: int
+    deleted_sources: int
+    deleted_reports: int
+
+
+class ResearchSourceItem(BaseModel):
+    source_id: int
+    source_type: str
+    url: str
+    scrape_status: str
+    extracted_summary: Optional[str] = None
+    error_message: Optional[str] = None
+    fetched_at: Optional[datetime] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class SessionSourcesResponse(BaseModel):
+    session_id: int
+    sources: List[ResearchSourceItem]
+
+
+class SessionReportResponse(BaseModel):
+    session_id: int
+    report_id: int
+    status: str
+    created_at: datetime
+    report_json: ResearchReportData
+
+
+class ChatReportResponse(BaseModel):
+    """Response for POST /api/chat/{id}/generate-report (Feature 2)."""
+
+    session_id: int
+    report_id: int
+    business_id: int
+    stage: str
+    # Reuses the existing structured report shape.
+    report_json: ResearchReportData

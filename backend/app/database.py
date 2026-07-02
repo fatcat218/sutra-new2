@@ -48,8 +48,34 @@ def get_db():
 
 
 def init_db():
-    """Create all tables. Called once on app startup (see main.py)."""
-    # Import models here so they are registered on Base before create_all runs.
+    """
+    Create tables only for the disposable SQLite development database.
+
+    PostgreSQL/Supabase schemas are managed by Alembic so every production
+    change is reviewed, versioned, and repeatable.
+    """
+    if not DATABASE_URL.startswith("sqlite"):
+        return
+
     from app import models  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
+    _run_light_migrations()
+
+
+def _run_light_migrations():
+    """
+    Tiny best-effort migrations for columns added after a table already exists.
+    SQLAlchemy's create_all only creates missing TABLES, not missing COLUMNS, so
+    an existing chat_sessions table won't gain the new `stage` column on its own.
+    We add it here for SQLite (dev/prototype). Real DBs should use migrations.
+    """
+    if not DATABASE_URL.startswith("sqlite"):
+        return
+    with engine.connect() as conn:
+        existing = [row[1] for row in conn.exec_driver_sql("PRAGMA table_info(chat_sessions)")]
+        if existing and "stage" not in existing:
+            conn.exec_driver_sql(
+                "ALTER TABLE chat_sessions ADD COLUMN stage VARCHAR(32) DEFAULT 'intake'"
+            )
+            conn.commit()

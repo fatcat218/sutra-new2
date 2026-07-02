@@ -30,6 +30,8 @@ from typing import Any, Dict
 
 import requests
 
+from app.services.prompt_templates import FINAL_REPORT_PROMPT
+
 # Default model per provider; override with AI_MODEL if you want.
 _DEFAULT_MODELS = {
     "openai": "gpt-4o-mini",
@@ -44,52 +46,21 @@ _REQUEST_TIMEOUT = 60
 # --------------------------------------------------------------------------- #
 # PROMPT
 # --------------------------------------------------------------------------- #
-# The system prompt encodes the careful, non-overclaiming behaviour required.
-_SYSTEM_PROMPT = """You are a senior consumer-research analyst for an Indian
-marketing intelligence platform. You produce ESTIMATED audience research to
-help small businesses and startups target their marketing.
-
-IMPORTANT RULES:
-- This is an ESTIMATED marketing research output, NOT guaranteed factual market
-  data. Do not invent statistics or cite fake sources.
-- Use cautious language: "likely audience", "estimated segment",
-  "recommended targeting direction", "this suggests", etc. Never overclaim.
-- Base your analysis on the business context provided. If the input is weak or
-  sparse, set confidence_score to "low" or "medium" and clearly list what is
-  missing in missing_information.
-- Tailor insights to the Indian market where relevant (regions, tiers,
-  languages, festivals, price sensitivity) but only when the context supports it.
-- Return VALID JSON ONLY. No markdown, no code fences, no commentary before or
-  after the JSON object.
-
-Return a JSON object with EXACTLY these keys:
-{
-  "business_summary": string,
-  "target_audience_overview": string,
-  "primary_segment": string,
-  "secondary_segment": string,
-  "age_groups": [string],
-  "demographic_analysis": string,
-  "socioeconomic_analysis": string,
-  "behavioral_analysis": string,
-  "buying_motivations": [string],
-  "pain_points": [string],
-  "best_marketing_channels": [string],
-  "campaign_angles": [string],
-  "confidence_score": "low" | "medium" | "high",
-  "missing_information": [string],
-  "recommended_follow_up_questions": [string]
-}"""
+# The strict-JSON report prompt now lives in prompt_templates.py.
+_SYSTEM_PROMPT = FINAL_REPORT_PROMPT
 
 
 def _build_user_prompt(business_context: str) -> str:
     return (
-        "Here is the business context gathered from the user's form and "
-        "(optionally) scraped from their website:\n\n"
+        "Here is the business intake gathered from the user's onboarding "
+        "conversation and (optionally) their website:\n\n"
         f"{business_context}\n\n"
-        "Produce the estimated consumer research report as strict JSON using the "
-        "exact keys described. Remember to keep claims cautious and to lower the "
-        "confidence_score if the context is thin."
+        "Build the personalised dashboard as strict JSON using the exact keys "
+        "described. Make every field specific to THIS business and reference the "
+        "details above directly — no generic advice. Prioritise actionable, "
+        "India-specific insight. If the context is thin, still give your best "
+        "grounded estimate, lower the confidence_score, and list the missing "
+        "inputs in missing_information."
     )
 
 

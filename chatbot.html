@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chat with Sutra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=ui-review-20260702-final">
+</head>
+<body class="chatbot-page">
+
+<canvas id="ring-grid" aria-hidden="true"></canvas>
+
+<nav>
+  <div class="wrap inner">
+    <a class="logo" href="index.html"><span>Sutra</span><span class="dot"></span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="how-it-works.html">How it works</a>
+      <a href="index.html#industries">Industries</a>
+    </div>
+    <div class="chatbot-nav-account">
+      <span data-auth-user hidden></span>
+      <a class="btn auth-nav-btn" data-auth-action
+         data-auth-href="#chatbot-auth-gate"
+         href="#chatbot-auth-gate">Sign up / Log in</a>
+    </div>
+  </div>
+</nav>
+
+<main class="chatbot-auth-gate" id="chatbot-auth-gate" hidden>
+  <section class="auth-page-card" aria-labelledby="chatbot-auth-title">
+    <div class="section-label">Your Sutra workspace</div>
+    <h1 id="chatbot-auth-title">Sign in, then start the <em>conversation.</em></h1>
+    <p class="auth-page-intro">
+      Log in or create an account here. As soon as you are authenticated, this
+      page becomes your saved research chatbot.
+    </p>
+
+    <div class="auth-mode-switch" role="tablist" aria-label="Choose sign in or sign up">
+      <button type="button" role="tab" data-chatbot-auth-mode="login"
+              aria-selected="true">Log in</button>
+      <button type="button" role="tab" data-chatbot-auth-mode="signup"
+              aria-selected="false">Sign up</button>
+    </div>
+
+    <form id="chatbot-account-form" class="account-form">
+      <label class="field" id="chatbot-account-name-field" hidden>
+        <span>Name</span>
+        <input id="chatbot-account-name" type="text" autocomplete="name"
+               placeholder="Your name">
+      </label>
+      <label class="field">
+        <span>Email</span>
+        <input id="chatbot-account-email" type="email" autocomplete="email"
+               required placeholder="you@business.com">
+      </label>
+      <label class="field">
+        <span>Password</span>
+        <input id="chatbot-account-password" type="password"
+               autocomplete="current-password" required minlength="8"
+               placeholder="At least 8 characters">
+      </label>
+      <button class="auth-forgot-password" id="chatbot-forgot-password"
+              type="button">Forgot password?</button>
+      <button class="btn btn-block" id="chatbot-account-submit" type="submit">
+        Log in
+      </button>
+      <p class="auth-page-error" id="chatbot-account-error" hidden></p>
+      <p class="auth-page-success" id="chatbot-account-success" hidden></p>
+    </form>
+
+    <p class="auth-page-fineprint">
+      Your password is handled by Supabase Auth and is never stored by Sutra.
+    </p>
+  </section>
+</main>
+
+<main class="chatbot-main" hidden id="chatbot-main">
+  <header class="chatbot-page-head wrap">
+    <div>
+      <div class="section-label">Consumer intelligence assistant</div>
+      <h1>Talk your way to a clearer <em>market.</em></h1>
+    </div>
+    <p>
+      Tell Sutra what you know. It will ask for what matters, preserve the
+      context, and turn the conversation into a research dashboard.
+    </p>
+  </header>
+
+  <section class="chatbot-workspace wrap">
+    <aside class="chatbot-sidebar">
+      <div class="chatbot-sidebar-head">
+        <div>
+          <span class="form-step">Saved conversations</span>
+          <h2>Your research</h2>
+        </div>
+        <button type="button" id="new-chat-button" aria-label="Start a new chat">＋</button>
+      </div>
+      <div class="chatbot-session-list" id="chatbot-session-list"></div>
+      <a class="chatbot-library-entry" href="research-library.html" id="chatbot-library-entry">
+        <span class="chatbot-library-icon" aria-hidden="true">▤</span>
+        <span class="chatbot-library-copy">
+          <b>Research Library</b>
+          <small>Manage all your saved research</small>
+        </span>
+        <span class="chatbot-profile-arrow">›</span>
+      </a>
+      <a class="chatbot-profile-entry" href="profile.html" id="chatbot-profile-entry">
+        <span class="chatbot-profile-avatar" data-profile-initials>U</span>
+        <span class="chatbot-profile-copy">
+          <b data-profile-name>Your account</b>
+          <small data-profile-email>Manage profile</small>
+        </span>
+        <span class="chatbot-profile-arrow">›</span>
+      </a>
+    </aside>
+
+    <div class="chatbot-surface">
+      <div class="chatbot-surface-head">
+        <div>
+          <span class="chatbot-status-dot"></span>
+          <span id="chatbot-session-title">New research chat</span>
+        </div>
+        <button class="chatbot-report-button" id="chatbot-report-button"
+                type="button" hidden>Generate dashboard</button>
+      </div>
+
+      <div class="chatbot-messages" id="chatbot-messages" aria-live="polite"></div>
+
+      <form class="chatbot-composer" id="chatbot-composer">
+        <label class="sr-only" for="chatbot-input">Message Sutra</label>
+        <textarea id="chatbot-input" rows="1"
+                  placeholder="Describe your business, customers, or goal…"></textarea>
+        <button class="btn" id="chatbot-send" type="submit" aria-label="Send message">
+          <span>Send</span>
+        </button>
+      </form>
+      <p class="chatbot-error" id="chatbot-error" hidden></p>
+    </div>
+  </section>
+
+  <section class="chatbot-report wrap" id="chatbot-report" hidden>
+    <div class="chatbot-report-head">
+      <div>
+        <div class="section-label">Generated research dashboard</div>
+        <h2 id="chatbot-report-title">Your market intelligence</h2>
+      </div>
+      <div class="chatbot-score" id="chatbot-score">—</div>
+    </div>
+    <div class="chatbot-report-grid" id="chatbot-report-grid"></div>
+  </section>
+</main>
+
+<div class="chatbot-auth-loading" id="chatbot-auth-loading">
+  <span class="dot-typing"></span><span class="dot-typing"></span><span class="dot-typing"></span>
+</div>
+
+<script src="main.js?v=ui-review-20260702-final" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="supabase-config.js?v=supabase-20260627" defer></script>
+<script src="supabase-client.js?v=auth-flow-20260627" defer></script>
+<script src="auth-nav.js?v=auth-flow-20260627" defer></script>
+<script src="chatbot.js?v=ui-review-20260702-final" defer></script>
+</body>
+</html>

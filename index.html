@@ -7,11 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=claude-ui-20260621">
+<link rel="stylesheet" href="style.css?v=ui-review-20260702-final">
 </head>
-<body>
-
-<canvas id="ring-grid" aria-hidden="true"></canvas>
+<body class="landing">
 
 <!-- ===== NAV ===== -->
 <nav>
@@ -23,25 +21,20 @@
       <a href="index.html#industries">Industries</a>
       <a href="about.html">About</a>
     </div>
-    <a class="btn" href="research.html">Try research <span class="arrow">→</span></a>
+    <a class="btn auth-nav-btn" data-auth-action
+       data-auth-href="chatbot.html"
+       href="chatbot.html">Sign up / Log in</a>
   </div>
 </nav>
 
 <!-- ===== HERO (centered) ===== -->
 <section class="hero">
   <div class="wrap">
-    <div class="kicker hero-animate hero-animate-1">
-      <span class="pill">Private pilot · Limited access</span>
-      <span>The AI growth platform · Built for Bharat</span>
-    </div>
+    <p class="hero-note hero-animate hero-animate-1">In private pilot · Built for Indian brands and startups</p>
 
-    <h1 class="headline">
-      <span class="word" style="animation-delay:0.10s"><span class="it">Know</span></span>
-      <span class="word" style="animation-delay:0.22s">your</span>
-      <span class="word" style="animation-delay:0.34s"><span class="accent-stroke">buyer.</span></span><br/>
-      <span class="word" style="animation-delay:0.54s"><span class="it">Own</span></span>
-      <span class="word" style="animation-delay:0.66s">your</span>
-      <span class="word" style="animation-delay:0.78s">market.</span>
+    <h1 class="headline hero-animate hero-animate-2">
+      <span class="it">Know</span> your <span class="accent-stroke">buyer.</span><br/>
+      <span class="it">Own</span> your market.
     </h1>
 
     <p class="hero-sub hero-animate hero-animate-3">
@@ -50,137 +43,71 @@
       — without the agency bill or the tool sprawl.
     </p>
 
-    <div class="cta-row hero-animate hero-animate-4">
-      <a class="btn" href="research.html">Start research <span class="arrow">→</span></a>
-      <a class="btn ghost" href="#how">See how it works</a>
+    <form class="landing-chat-entry hero-animate hero-animate-4"
+          id="landing-chat-form" action="chatbot.html" method="get"
+          target="_blank">
+      <label class="sr-only" for="landing-chat-input">Ask Sutra about your business</label>
+      <textarea id="landing-chat-input" rows="3"
+                placeholder="Tell Sutra about your business, customers, or marketing goal…"></textarea>
+      <button class="btn landing-chat-send" type="submit">
+        Ask Sutra
+        <svg class="btn-icon" viewBox="0 0 16 16" width="15" height="15" fill="none"
+             stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true">
+          <line x1="4" y1="12" x2="12" y2="4"/>
+          <polyline points="5.5 4 12 4 12 10.5"/>
+        </svg>
+      </button>
+    </form>
+    <div class="landing-chat-suggestions hero-animate hero-animate-4">
+      <span>Or start with</span>
+      <a href="chatbot.html" target="_blank" rel="noopener"
+         data-chat-suggestion="Help me identify the strongest audience for my business.">
+        Find my core audience
+      </a>
+      <a href="chatbot.html" target="_blank" rel="noopener"
+         data-chat-suggestion="Help me understand why customers would choose my product over competitors.">
+        Sharpen my positioning
+      </a>
+      <a href="chatbot.html" target="_blank" rel="noopener"
+         data-chat-suggestion="Give me campaign angles based on my product and likely buyers.">
+        Build campaign angles
+      </a>
     </div>
-    <p class="cta-nocard hero-animate hero-animate-4">No credit card required</p>
+    <p class="cta-nocard hero-animate hero-animate-4">Free to start · Your research stays saved</p>
   </div>
 </section>
 
-<!-- ===== ANIMATED DEMO ===== -->
-<section class="demo-wrap">
+<!-- ===== THE RESEARCH WORKFLOW (static, editorial) ===== -->
+<section class="product-flow">
   <div class="wrap">
-    <div class="demo">
-      <div class="demo-toolbar">
-        <span class="tdot"></span><span class="tdot"></span><span class="tdot"></span>
-        <span class="url">sutra.ai / workspace</span>
-        <span class="live">● Live demo</span>
+    <div class="product-flow-head">
+      <div class="section-label">What happens when you ask</div>
+      <p class="product-flow-lead">
+        Tell Sutra what you know. It asks for what matters, preserves the
+        context, and turns the conversation into a research dashboard.
+      </p>
+    </div>
+    <div class="product-flow-steps">
+      <div class="pf-step">
+        <span class="pf-num">01</span>
+        <h3>Describe your business</h3>
+        <p>A few sentences about your product, customers, or marketing goal is enough to begin.</p>
       </div>
-
-      <div class="demo-stage">
-        <!-- Scene 1 — Research -->
-        <div class="scene scene-1">
-          <div class="s-research">
-            <div class="left">
-              <div class="label">01 · Consumer Research</div>
-              <h4>Tier-2 women 24-32 in <span class="acc">apparel</span>.</h4>
-              <div class="seg"><span class="val">78%</span><span class="lab">Trust > Discount</span><div class="bar"></div></div>
-              <div class="seg"><span class="val">54%</span><span class="lab">EMI clarity matters</span><div class="bar"></div></div>
-              <div class="seg"><span class="val">91%</span><span class="lab">Regional creator preference</span><div class="bar"></div></div>
-            </div>
-            <div class="right">
-              <div class="radar">
-                <div class="sweep"></div>
-                <div class="radar-center"></div>
-                <div class="radar-dot rd1"></div>
-                <div class="radar-dot rd2"></div>
-                <div class="radar-dot rd3"></div>
-                <div class="radar-dot rd4"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Scene 2 — Create -->
-        <div class="scene scene-2">
-          <div class="s-create">
-            <div>
-              <div class="label">02 · AI Ad-storm</div>
-              <h4>Generating <span class="acc">14s reel</span> for Meta.</h4>
-              <div class="script-area">
-                <div class="line"><span class="dim">// 0:00 - 0:02</span></div>
-                <div class="line"><span class="cyan">HOOK</span> Close-up: artisan stitching, shot golden hour</div>
-                <div class="line"><span class="dim">// 0:02 - 0:06</span></div>
-                <div class="line"><span class="cyan">REVEAL</span> Model in finished kurta walking through bazaar</div>
-                <div class="line"><span class="dim">// 0:06 - 0:14</span></div>
-                <div class="line"><span class="cyan">CTA</span> "Stitched in Surat. Worn everywhere." <span class="cursor"></span></div>
-              </div>
-            </div>
-            <div class="ad-mock">
-              <span class="tag">Generated v3 · 14s reel</span>
-              <div>
-                <div class="ad-h">"Stitched in Surat. Worn everywhere."</div>
-                <div class="ad-meta">META + REELS · 9:16 · CTR-OPTIMIZED</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Scene 3 — Launch -->
-        <div class="scene scene-3">
-          <div class="s-launch">
-            <div class="label">03 · One-click Launch</div>
-            <h4>Live across <span class="acc">4 platforms</span> in 90 seconds.</h4>
-            <div class="launch-grid">
-              <div class="conn conn-1"></div><div class="conn conn-2"></div>
-              <div class="conn conn-3"></div><div class="conn conn-4"></div>
-              <div class="launch-center">S</div>
-              <div class="platform-chip pc-1 live">Meta Ads</div>
-              <div class="platform-chip pc-2 live">Google</div>
-              <div class="platform-chip pc-3 live">Instagram Reels</div>
-              <div class="platform-chip pc-4 live">YouTube</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Scene 4 — Optimize -->
-        <div class="scene scene-4">
-          <div class="s-opt">
-            <div>
-              <div class="label">04 · Day 7 Performance</div>
-              <h4>AI shifts spend to what's <span class="acc">actually working</span>.</h4>
-              <div class="chart-area">
-                <svg viewBox="0 0 400 220" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="cf" x1="0" x2="0" y1="0" y2="1">
-                      <stop offset="0%" stop-color="#06402b" stop-opacity="0.6"/>
-                      <stop offset="100%" stop-color="#06402b" stop-opacity="0"/>
-                    </linearGradient>
-                  </defs>
-                  <line x1="0" y1="180" x2="400" y2="180" stroke="rgba(6,40,30,0.15)"/>
-                  <line x1="0" y1="120" x2="400" y2="120" stroke="rgba(6,40,30,0.08)" stroke-dasharray="2 4"/>
-                  <line x1="0" y1="60"  x2="400" y2="60"  stroke="rgba(6,40,30,0.08)" stroke-dasharray="2 4"/>
-                  <path d="M0,160 C50,150 90,155 130,130 C170,108 200,90 240,68 C280,50 320,40 400,20 L400,220 L0,220 Z" fill="url(#cf)"/>
-                  <path d="M0,160 C50,150 90,155 130,130 C170,108 200,90 240,68 C280,50 320,40 400,20" fill="none" stroke="#2f6b4e" stroke-width="2"/>
-                  <circle cx="400" cy="20" r="5" fill="#2f6b4e"/>
-                  <circle cx="400" cy="20" r="11" fill="#2f6b4e" fill-opacity="0.25"/>
-                </svg>
-              </div>
-            </div>
-            <div class="metrics-stack">
-              <div class="met-card">
-                <div class="ml">CPA</div>
-                <div class="mv">₹47<span class="delta">↓ 62%</span></div>
-              </div>
-              <div class="met-card">
-                <div class="ml">ROAS</div>
-                <div class="mv">4.2x<span class="delta">↑ 280%</span></div>
-              </div>
-              <div class="met-card">
-                <div class="ml">CTR</div>
-                <div class="mv">5.8%<span class="delta">↑ 312%</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="pf-step">
+        <span class="pf-num">02</span>
+        <h3>Answer what matters</h3>
+        <p>Sutra asks focused questions and keeps the full conversation, so you can pick it up any time.</p>
       </div>
-
-      <div class="demo-progress">
-        <div class="step dp-1">01 — Research</div>
-        <div class="step dp-2">02 — Create</div>
-        <div class="step dp-3">03 — Launch</div>
-        <div class="step dp-4">04 — Optimize</div>
+      <div class="pf-step">
+        <span class="pf-num">03</span>
+        <h3>Sources, saved</h3>
+        <p>Links you share — your website, Instagram, competitors — are read and stored with your session.</p>
+      </div>
+      <div class="pf-step">
+        <span class="pf-num">04</span>
+        <h3>A research dashboard</h3>
+        <p>Targeting summary, audience segments, pain points, and recommended channels — saved to your library.</p>
       </div>
     </div>
   </div>
@@ -377,49 +304,39 @@
 
     <!-- ── Consumer Intelligence Model ── -->
     <div class="cim-block">
-      <div class="cim-layout">
+      <div class="meth-subtitle">Consumer Intelligence Model</div>
+      <h3 class="meth-h3">Four data layers.<br/><em>One audience truth.</em></h3>
+      <p class="meth-lead">Before a single rupee is spent, Sutra maps your ideal buyer across four dimensions that most marketing tools ignore entirely.</p>
 
-        <div class="cim-canvas-wrap">
-          <canvas class="cim-canvas" width="440" height="400"></canvas>
-        </div>
-
-        <div>
-          <div class="meth-subtitle">Consumer Intelligence Model</div>
-          <h3 class="meth-h3">Four data layers.<br/><em>One audience truth.</em></h3>
-          <p class="meth-lead">Before a single rupee is spent, Sutra maps your ideal buyer across four dimensions that most marketing tools ignore entirely.</p>
-
-          <div class="cim-layers">
-            <div class="cim-layer">
-              <div class="cl-icon">i</div>
-              <div class="cl-content">
-                <h4>Demographics</h4>
-                <p>Age, gender, income band, geography — resolution down to district level.</p>
-              </div>
-            </div>
-            <div class="cim-layer">
-              <div class="cl-icon">ii</div>
-              <div class="cl-content">
-                <h4>Behavioural Signals</h4>
-                <p>Purchase triggers, scroll patterns, seasonal sensitivity, EMI preference.</p>
-              </div>
-            </div>
-            <div class="cim-layer">
-              <div class="cl-icon">iii</div>
-              <div class="cl-content">
-                <h4>Cultural Context</h4>
-                <p>Regional language preference, festival cycles, aspiration archetypes.</p>
-              </div>
-            </div>
-            <div class="cim-layer">
-              <div class="cl-icon">iv</div>
-              <div class="cl-content">
-                <h4>Regional Nuance</h4>
-                <p>What converts in Jaipur won't in Kochi. Sutra knows the difference.</p>
-              </div>
-            </div>
+      <div class="data-layers">
+        <div class="data-layer">
+          <span class="dl-num">i</span>
+          <div class="dl-content">
+            <h4>Demographics</h4>
+            <p>Age, gender, income band, geography — resolution down to district level.</p>
           </div>
         </div>
-
+        <div class="data-layer">
+          <span class="dl-num">ii</span>
+          <div class="dl-content">
+            <h4>Behavioural Signals</h4>
+            <p>Purchase triggers, scroll patterns, seasonal sensitivity, EMI preference.</p>
+          </div>
+        </div>
+        <div class="data-layer">
+          <span class="dl-num">iii</span>
+          <div class="dl-content">
+            <h4>Cultural Context</h4>
+            <p>Regional language preference, festival cycles, aspiration archetypes.</p>
+          </div>
+        </div>
+        <div class="data-layer">
+          <span class="dl-num">iv</span>
+          <div class="dl-content">
+            <h4>Regional Nuance</h4>
+            <p>What converts in Jaipur won't in Kochi. Sutra knows the difference.</p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -447,7 +364,7 @@
           </div>
 
           <div class="vp-arrow">
-            <div class="vp-arrow-line"><div class="vp-arrow-dot"></div></div>
+            <div class="vp-arrow-line"></div>
           </div>
 
           <div class="vp-step">
@@ -462,7 +379,7 @@
           </div>
 
           <div class="vp-arrow">
-            <div class="vp-arrow-line"><div class="vp-arrow-dot"></div></div>
+            <div class="vp-arrow-line"></div>
           </div>
 
           <div class="vp-step">
@@ -477,7 +394,7 @@
           </div>
 
           <div class="vp-arrow">
-            <div class="vp-arrow-line"><div class="vp-arrow-dot"></div></div>
+            <div class="vp-arrow-line"></div>
           </div>
 
           <div class="vp-step">
@@ -493,7 +410,7 @@
           </div>
 
           <div class="vp-arrow">
-            <div class="vp-arrow-line"><div class="vp-arrow-dot"></div></div>
+            <div class="vp-arrow-line"></div>
           </div>
 
           <div class="vp-step">
@@ -509,7 +426,7 @@
           </div>
 
           <div class="vp-arrow">
-            <div class="vp-arrow-line"><div class="vp-arrow-dot"></div></div>
+            <div class="vp-arrow-line"></div>
           </div>
 
           <div class="vp-step">
@@ -629,7 +546,7 @@
           <li>1 connected ad account</li>
           <li>Community support</li>
         </ul>
-        <a class="btn ghost" href="waitlist.html">Start free <span class="arrow">→</span></a>
+        <a class="btn ghost" href="waitlist.html">Start free</a>
       </div>
 
       <div class="plan featured">
@@ -649,7 +566,7 @@
           <li>A/B testing on all campaigns</li>
           <li>Email support &amp; onboarding</li>
         </ul>
-        <a class="btn" href="waitlist.html">Join waitlist <span class="arrow">→</span></a>
+        <a class="btn" href="waitlist.html">Join waitlist</a>
       </div>
 
       <div class="plan">
@@ -667,7 +584,7 @@
           <li>Workflow consult + named CSM</li>
           <li>SLA-backed support</li>
         </ul>
-        <a class="btn ghost" href="waitlist.html">Talk to us <span class="arrow">→</span></a>
+        <a class="btn ghost" href="waitlist.html">Talk to us</a>
       </div>
 
     </div>
@@ -681,10 +598,11 @@
   <div class="wrap inner">
     <div class="kicker">Limited beta · First 100 brands onboard free</div>
     <h2>Stop guessing.<br/>Start <em>growing.</em></h2>
-    <form class="signup" onsubmit="event.preventDefault(); this.querySelector('button').innerHTML='You\u2019re in <span class=\u0027arrow\u0027>✓</span>'; this.querySelector('input').value='';">
-      <input type="email" required placeholder="your@business.in" />
-      <button type="submit" class="btn">Join waitlist <span class="arrow">→</span></button>
+    <form class="signup" data-waitlist-form>
+      <input name="email" type="email" required placeholder="your@business.in" />
+      <button type="submit" class="btn">Join waitlist</button>
     </form>
+    <p data-waitlist-status></p>
     <div class="final-meta">
       <span>Free forever tier</span>
       <span>No credit card</span>
@@ -701,7 +619,13 @@
   </div>
 </footer>
 
-<script src="main.js?v=claude-ui-20260621" defer></script>
+<script src="main.js?v=ui-review-20260702-final" defer></script>
+<script src="waitlist.js?v=ui-review-20260702-final" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="supabase-config.js?v=supabase-20260627" defer></script>
+<script src="supabase-client.js?v=auth-flow-20260627" defer></script>
+<script src="auth-nav.js?v=auth-flow-20260627" defer></script>
+<script src="landing-chat.js?v=new-tab-20260627" defer></script>
 
 </body>
 </html>

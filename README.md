@@ -5,15 +5,18 @@ contains:
 
 - a static frontend landing/product experience
 - a FastAPI backend for consumer research
-- a working research-to-video-brief flow
+- a Supabase-authenticated research chatbot and dashboard flow
 
 ## Project Structure
 
 ```text
 .
 ├── index.html              # Main landing page
-├── research.html           # Consumer Research product page
-├── research.js             # Frontend API integration and report rendering
+├── chatbot.html            # Combined Login/Signup gate + research workspace
+├── chatbot.js              # Auth, chat, history, and report integration
+├── research-library.html   # Research Library (manage saved research)
+├── research-library.js     # Library search/sort/rename/delete/report logic
+├── supabase-client.js      # Shared persistent browser auth client
 ├── main.js                 # Shared animations/interactions
 ├── style.css               # Site styling
 └── backend/
@@ -27,7 +30,7 @@ contains:
 - Python 3.9+
 - An OpenRouter, OpenAI, Gemini, or Claude API key
 
-The default local setup uses OpenRouter and SQLite.
+The production data path uses Supabase PostgreSQL/Auth.
 
 ## Backend Setup
 
@@ -67,16 +70,44 @@ python3 -m http.server 3000
 Then open:
 
 - Frontend: http://localhost:3000
-- Research page: http://localhost:3000/research.html
+- Chatbot: http://localhost:3000/chatbot.html
 
 ## What Works Now
 
-- The user can enter product/business details.
-- The backend can generate an estimated consumer research report.
-- The frontend displays the structured report.
-- The user can choose a next creative format.
-- The Video branch creates a frontend-only draft video direction from the report.
-- Instagram ads, YouTube ads, and Posters are visible but intentionally disabled.
+- The landing chat entry carries a prompt through authentication.
+- Supabase sessions persist until logout.
+- Unauthenticated chatbot visits show login/sign-up on the chatbot page.
+- Login includes email-based password recovery and a dedicated reset page.
+- Conversations and message history can be resumed.
+- The backend generates and saves an estimated consumer research dashboard.
+
+## Research Library
+
+`research-library.html` (linked from the chatbot sidebar) lets each signed-in
+user manage all of their saved research:
+
+- Cards show the title, created/updated dates, a preview of the latest
+  message, the message count, and the report status.
+- Search by title or preview text; sort by newest or oldest.
+- Open a conversation (resumes it in the chatbot), rename it, view its saved
+  sources, open its generated dashboard, or delete it (with confirmation).
+- Deleting a session also removes its messages, sources, and reports.
+- Unauthenticated visitors are redirected to `chatbot.html` to log in.
+
+Library API endpoints (all require a Supabase bearer token and only ever
+return the authenticated user's own data):
+
+| Method | Path                          | Purpose                                   |
+| ------ | ----------------------------- | ----------------------------------------- |
+| GET    | `/api/chat/sessions`          | List sessions + library metadata          |
+| PATCH  | `/api/chat/{session_id}`      | Rename a session                          |
+| DELETE | `/api/chat/{session_id}`      | Delete a session, its messages/sources/reports |
+| GET    | `/api/chat/{session_id}/sources` | Saved research sources for a session   |
+| GET    | `/api/chat/{session_id}/report`  | Latest generated report for a session  |
+
+No extra setup is required beyond the existing backend `.env`; the library
+uses the existing `research_sessions`, `chat_messages`, `research_sources`,
+and `research_reports` tables.
 
 ## Important Security Notes
 
