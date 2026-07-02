@@ -14,6 +14,8 @@ contains:
 ├── index.html              # Main landing page
 ├── chatbot.html            # Combined Login/Signup gate + research workspace
 ├── chatbot.js              # Auth, chat, history, and report integration
+├── research-library.html   # Research Library (manage saved research)
+├── research-library.js     # Library search/sort/rename/delete/report logic
 ├── supabase-client.js      # Shared persistent browser auth client
 ├── main.js                 # Shared animations/interactions
 ├── style.css               # Site styling
@@ -75,8 +77,37 @@ Then open:
 - The landing chat entry carries a prompt through authentication.
 - Supabase sessions persist until logout.
 - Unauthenticated chatbot visits show login/sign-up on the chatbot page.
+- Login includes email-based password recovery and a dedicated reset page.
 - Conversations and message history can be resumed.
 - The backend generates and saves an estimated consumer research dashboard.
+
+## Research Library
+
+`research-library.html` (linked from the chatbot sidebar) lets each signed-in
+user manage all of their saved research:
+
+- Cards show the title, created/updated dates, a preview of the latest
+  message, the message count, and the report status.
+- Search by title or preview text; sort by newest or oldest.
+- Open a conversation (resumes it in the chatbot), rename it, view its saved
+  sources, open its generated dashboard, or delete it (with confirmation).
+- Deleting a session also removes its messages, sources, and reports.
+- Unauthenticated visitors are redirected to `chatbot.html` to log in.
+
+Library API endpoints (all require a Supabase bearer token and only ever
+return the authenticated user's own data):
+
+| Method | Path                          | Purpose                                   |
+| ------ | ----------------------------- | ----------------------------------------- |
+| GET    | `/api/chat/sessions`          | List sessions + library metadata          |
+| PATCH  | `/api/chat/{session_id}`      | Rename a session                          |
+| DELETE | `/api/chat/{session_id}`      | Delete a session, its messages/sources/reports |
+| GET    | `/api/chat/{session_id}/sources` | Saved research sources for a session   |
+| GET    | `/api/chat/{session_id}/report`  | Latest generated report for a session  |
+
+No extra setup is required beyond the existing backend `.env`; the library
+uses the existing `research_sessions`, `chat_messages`, `research_sources`,
+and `research_reports` tables.
 
 ## Important Security Notes
 

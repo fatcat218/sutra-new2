@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Research Library — Sutra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=ui-review-20260702-final">
+</head>
+<body class="chatbot-page library-page">
+
+<canvas id="ring-grid" aria-hidden="true"></canvas>
+
+<nav>
+  <div class="wrap inner">
+    <a class="logo" href="index.html"><span>Sutra</span><span class="dot"></span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="chatbot.html">Chatbot</a>
+      <a href="how-it-works.html">How it works</a>
+    </div>
+    <div class="chatbot-nav-account">
+      <span data-auth-user hidden></span>
+      <a class="btn auth-nav-btn" data-auth-action
+         data-auth-href="chatbot.html"
+         href="chatbot.html">Sign up / Log in</a>
+    </div>
+  </div>
+</nav>
+
+<main class="library-main wrap" id="library-main" hidden>
+  <header class="chatbot-page-head">
+    <div>
+      <div class="section-label">Research Library</div>
+      <h1>Every insight, <em>saved.</em></h1>
+    </div>
+    <p>
+      Browse, rename, and reopen the research conversations you have built with
+      Sutra — including their saved sources and generated dashboards.
+    </p>
+  </header>
+
+  <section class="library-toolbar" aria-label="Search and sort your research">
+    <label class="library-search">
+      <span class="sr-only">Search your research</span>
+      <input type="search" id="library-search" placeholder="Search your research…" autocomplete="off">
+    </label>
+    <label class="library-sort">
+      <span class="sr-only">Sort order</span>
+      <select id="library-sort">
+        <option value="newest" selected>Newest first</option>
+        <option value="oldest">Oldest first</option>
+      </select>
+    </label>
+    <a class="btn" href="chatbot.html" id="library-new-chat">New research</a>
+  </section>
+
+  <p class="library-count" id="library-count" hidden></p>
+
+  <div class="library-loading" id="library-loading">
+    <span class="dot-typing"></span><span class="dot-typing"></span><span class="dot-typing"></span>
+    <span class="library-loading-text">Loading your research…</span>
+  </div>
+
+  <div class="library-error" id="library-error" hidden>
+    <p id="library-error-text">Could not load your research.</p>
+    <button type="button" class="btn" id="library-retry">Try again</button>
+  </div>
+
+  <div class="library-empty" id="library-empty" hidden>
+    <div class="library-empty-mark" aria-hidden="true">▤</div>
+    <h2>No research yet</h2>
+    <p>Start a conversation with Sutra and it will be saved here automatically.</p>
+    <a class="btn" href="chatbot.html">Start your first research</a>
+  </div>
+
+  <div class="library-empty" id="library-no-results" hidden>
+    <h2>No matches</h2>
+    <p>No research matches your search. Try a different term.</p>
+  </div>
+
+  <section class="library-grid" id="library-grid" aria-live="polite"></section>
+</main>
+
+<div class="chatbot-auth-loading" id="library-auth-loading">
+  <span class="dot-typing"></span><span class="dot-typing"></span><span class="dot-typing"></span>
+</div>
+
+<!-- Modal shell shared by rename / delete / sources / report -->
+<div class="library-modal-backdrop" id="library-modal" hidden>
+  <div class="library-modal" role="dialog" aria-modal="true" aria-labelledby="library-modal-title">
+    <div class="library-modal-head">
+      <h2 id="library-modal-title">Modal</h2>
+      <button type="button" class="library-modal-close" id="library-modal-close" aria-label="Close">✕</button>
+    </div>
+    <div class="library-modal-body" id="library-modal-body"></div>
+  </div>
+</div>
+
+<script src="main.js?v=ui-review-20260702-final" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="supabase-config.js?v=supabase-20260627" defer></script>
+<script src="supabase-client.js?v=auth-flow-20260627" defer></script>
+<script src="auth-nav.js?v=auth-flow-20260627" defer></script>
+<script src="research-library.js?v=ui-review-20260702-final" defer></script>
+</body>
+</html>

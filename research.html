@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=session-20260627">
+<link rel="stylesheet" href="style.css?v=ui-review-20260702-final">
 </head>
 <body class="research-page">
 
@@ -25,7 +25,7 @@
     <div class="nav-account">
       <span class="nav-user-tag" id="nav-user-tag" hidden></span>
       <button class="nav-logout" id="nav-logout" type="button" hidden>Log out</button>
-      <a class="btn" href="#start">Start research <span class="arrow">→</span></a>
+      <a class="btn" href="#start">Start research</a>
     </div>
   </div>
 </nav>
@@ -84,7 +84,7 @@
           <div class="setup-submit-row">
             <p id="setup-error" class="setup-error" hidden></p>
             <button class="btn" type="submit" id="try-research">
-              Try researching <span class="arrow">→</span>
+              Try researching
             </button>
           </div>
         </form>
@@ -142,7 +142,7 @@
             <textarea id="chat-input" rows="1"
                       placeholder="Message Sutra… (Shift+Enter for a new line)"></textarea>
             <button class="btn" type="submit" id="chat-send" aria-label="Send">
-              <span class="arrow">→</span>
+              Send
             </button>
           </form>
           <div class="dashboard-action" id="dashboard-action" hidden>
@@ -151,7 +151,7 @@
               <p>Sutra has enough business context to build your audience and market-intelligence dashboard.</p>
             </div>
             <button class="btn" type="button" id="generate-dashboard">
-              Generate dashboard <span class="arrow">→</span>
+              Generate dashboard
             </button>
           </div>
           <p class="chat-error" id="chat-error" hidden></p>
@@ -250,7 +250,7 @@
                placeholder="Choose a password">
       </label>
       <button class="btn btn-block" type="submit">
-        Continue to research <span class="arrow">→</span>
+        Continue to research
       </button>
       <p class="chat-error" id="auth-error" hidden></p>
       <p class="auth-fineprint">Your account and research history are saved securely.</p>
@@ -258,9 +258,9 @@
   </div>
 </div>
 
-<script src="main.js?v=claude-ui-20260621" defer></script>
+<script src="main.js?v=ui-review-20260702-final" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="supabase-config.js?v=supabase-20260627" defer></script>
-<script src="research.js?v=session-20260627" defer></script>
+<script src="research.js?v=ui-review-20260702-final" defer></script>
 </body>
 </html>

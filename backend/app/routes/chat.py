@@ -14,6 +14,7 @@ Routes stay thin: persistence + AI orchestration live in chat_service.
 
 from fastapi import APIRouter, Depends, HTTPException
 import requests
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app import models, schemas
@@ -139,18 +140,94 @@ def get_history(
     )
 
 
+def _get_owned_session(
+    db: Session, session_id: int, user_id
+) -> models.ChatSession:
+    """Fetch a session that belongs to the given user, or raise 404."""
+    session = (
+        db.query(models.ChatSession)
+        .filter(
+            models.ChatSession.id == session_id,
+            models.ChatSession.user_id == user_id,
+        )
+        .first()
+    )
+    if session is None:
+        raise HTTPException(status_code=404, detail="Chat session not found.")
+    return session
+
+
 @router.get("/sessions", response_model=schemas.ChatSessionsResponse)
 def list_sessions(
     db: Session = Depends(get_db),
     profile: models.Profile = Depends(get_current_profile),
 ):
-    """List the user's resumable research conversations, newest first."""
+    """
+    List the user's resumable research conversations, newest first, enriched
+    with Research Library metadata (message count, preview, report status,
+    source count).
+    """
     sessions = (
         db.query(models.ChatSession)
         .filter(models.ChatSession.user_id == profile.id)
         .order_by(models.ChatSession.updated_at.desc())
         .all()
     )
+    session_ids = [s.id for s in sessions]
+
+    message_counts: dict[int, int] = {}
+    source_counts: dict[int, int] = {}
+    previews: dict[int, str] = {}
+    latest_reports: dict[int, tuple[int, str]] = {}
+
+    if session_ids:
+        for sid, count in (
+            db.query(models.ChatMessage.session_id, func.count(models.ChatMessage.id))
+            .filter(models.ChatMessage.session_id.in_(session_ids))
+            .group_by(models.ChatMessage.session_id)
+            .all()
+        ):
+            message_counts[sid] = count
+
+        for sid, count in (
+            db.query(models.ResearchSource.session_id, func.count(models.ResearchSource.id))
+            .filter(models.ResearchSource.session_id.in_(session_ids))
+            .group_by(models.ResearchSource.session_id)
+            .all()
+        ):
+            source_counts[sid] = count
+
+        # Latest non-system message per session -> preview text.
+        last_message_ids = (
+            db.query(func.max(models.ChatMessage.id))
+            .filter(
+                models.ChatMessage.session_id.in_(session_ids),
+                models.ChatMessage.role != "system",
+            )
+            .group_by(models.ChatMessage.session_id)
+            .all()
+        )
+        ids = [row[0] for row in last_message_ids]
+        if ids:
+            for message in (
+                db.query(models.ChatMessage)
+                .filter(models.ChatMessage.id.in_(ids))
+                .all()
+            ):
+                text = " ".join((message.content or "").split())
+                previews[message.session_id] = (
+                    text[:157] + "…" if len(text) > 160 else text
+                )
+
+        # Latest report per session (id + status).
+        for report in (
+            db.query(models.ResearchReport)
+            .filter(models.ResearchReport.session_id.in_(session_ids))
+            .order_by(models.ResearchReport.session_id, models.ResearchReport.id)
+            .all()
+        ):
+            latest_reports[report.session_id] = (report.id, report.status)
+
     return schemas.ChatSessionsResponse(
         sessions=[
             schemas.ChatSessionSummary(
@@ -160,7 +237,138 @@ def list_sessions(
                 status=session.status,
                 created_at=session.created_at,
                 updated_at=session.updated_at,
+                message_count=message_counts.get(session.id, 0),
+                preview=previews.get(session.id),
+                report_id=latest_reports.get(session.id, (None, None))[0],
+                report_status=latest_reports.get(session.id, (None, None))[1],
+                source_count=source_counts.get(session.id, 0),
             )
             for session in sessions
         ]
+    )
+
+
+@router.patch("/{session_id}", response_model=schemas.ChatSessionSummary)
+def rename_session(
+    session_id: int,
+    payload: schemas.SessionRenameRequest,
+    db: Session = Depends(get_db),
+    profile: models.Profile = Depends(get_current_profile),
+):
+    """Rename one of the user's research sessions."""
+    session = _get_owned_session(db, session_id, profile.id)
+    session.title = payload.title.strip()
+    db.commit()
+    db.refresh(session)
+    return schemas.ChatSessionSummary(
+        session_id=session.id,
+        title=session.title,
+        stage=session.stage,
+        status=session.status,
+        created_at=session.created_at,
+        updated_at=session.updated_at,
+    )
+
+
+@router.delete("/{session_id}", response_model=schemas.SessionDeleteResponse)
+def delete_session(
+    session_id: int,
+    db: Session = Depends(get_db),
+    profile: models.Profile = Depends(get_current_profile),
+):
+    """
+    Delete a session together with its messages, sources, and reports.
+    Messages and sources cascade via their FKs; reports would otherwise be
+    orphaned (FK is SET NULL), so they are deleted explicitly here.
+    """
+    session = _get_owned_session(db, session_id, profile.id)
+
+    deleted_messages = (
+        db.query(models.ChatMessage)
+        .filter(models.ChatMessage.session_id == session.id)
+        .delete(synchronize_session=False)
+    )
+    deleted_sources = (
+        db.query(models.ResearchSource)
+        .filter(models.ResearchSource.session_id == session.id)
+        .delete(synchronize_session=False)
+    )
+    deleted_reports = (
+        db.query(models.ResearchReport)
+        .filter(models.ResearchReport.session_id == session.id)
+        .delete(synchronize_session=False)
+    )
+    db.query(models.ChatSession).filter(
+        models.ChatSession.id == session.id
+    ).delete(synchronize_session=False)
+    db.commit()
+
+    return schemas.SessionDeleteResponse(
+        status="deleted",
+        session_id=session_id,
+        deleted_messages=deleted_messages,
+        deleted_sources=deleted_sources,
+        deleted_reports=deleted_reports,
+    )
+
+
+@router.get("/{session_id}/sources", response_model=schemas.SessionSourcesResponse)
+def get_session_sources(
+    session_id: int,
+    db: Session = Depends(get_db),
+    profile: models.Profile = Depends(get_current_profile),
+):
+    """Return the saved research sources captured for one of the user's sessions."""
+    session = _get_owned_session(db, session_id, profile.id)
+    sources = (
+        db.query(models.ResearchSource)
+        .filter(models.ResearchSource.session_id == session.id)
+        .order_by(models.ResearchSource.id)
+        .all()
+    )
+    return schemas.SessionSourcesResponse(
+        session_id=session.id,
+        sources=[
+            schemas.ResearchSourceItem(
+                source_id=source.id,
+                source_type=source.source_type,
+                url=source.url,
+                scrape_status=source.scrape_status,
+                extracted_summary=source.extracted_summary,
+                error_message=source.error_message,
+                fetched_at=source.fetched_at,
+                created_at=source.created_at,
+            )
+            for source in sources
+        ],
+    )
+
+
+@router.get("/{session_id}/report", response_model=schemas.SessionReportResponse)
+def get_session_report(
+    session_id: int,
+    db: Session = Depends(get_db),
+    profile: models.Profile = Depends(get_current_profile),
+):
+    """Return the latest generated report for one of the user's sessions."""
+    session = _get_owned_session(db, session_id, profile.id)
+    report = (
+        db.query(models.ResearchReport)
+        .filter(
+            models.ResearchReport.session_id == session.id,
+            models.ResearchReport.status == "complete",
+        )
+        .order_by(models.ResearchReport.id.desc())
+        .first()
+    )
+    if report is None or not report.report_json:
+        raise HTTPException(
+            status_code=404, detail="No generated report for this session yet."
+        )
+    return schemas.SessionReportResponse(
+        session_id=session.id,
+        report_id=report.id,
+        status=report.status,
+        created_at=report.created_at,
+        report_json=schemas.ResearchReportData(**report.report_json),
     )

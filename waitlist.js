@@ -33,7 +33,7 @@
         if (status) status.textContent = result.message || "You’re on the list.";
       } catch (error) {
         button.disabled = false;
-        button.innerHTML = 'Try again <span class="arrow">→</span>';
+        button.innerHTML = 'Try again';
         if (status) status.textContent = error.message || "Something went wrong.";
       }
     });

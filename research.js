@@ -262,7 +262,7 @@
     } finally {
       submitButton.disabled = false;
       submitButton.innerHTML =
-        'Continue to research <span class="arrow">→</span>';
+        'Continue to research';
     }
   });
 
@@ -309,7 +309,7 @@
     sendBtn.disabled = false;
     generateDashboardBtn.disabled = false;
     generateDashboardBtn.innerHTML =
-      'Generate dashboard <span class="arrow">→</span>';
+      'Generate dashboard';
     navUserTag.textContent = "";
     navUserTag.hidden = true;
     navLogout.hidden = true;
@@ -459,7 +459,7 @@
     } catch (error) {
       showError(friendlyError(error));
       generateDashboardBtn.disabled = false;
-      generateDashboardBtn.innerHTML = 'Generate dashboard <span class="arrow">→</span>';
+      generateDashboardBtn.innerHTML = 'Generate dashboard';
     } finally {
       state.generatingDashboard = false;
     }

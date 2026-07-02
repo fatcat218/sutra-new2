@@ -9,6 +9,7 @@
   const authName = document.getElementById("chatbot-account-name");
   const authEmail = document.getElementById("chatbot-account-email");
   const authPassword = document.getElementById("chatbot-account-password");
+  const forgotPassword = document.getElementById("chatbot-forgot-password");
   const authSubmit = document.getElementById("chatbot-account-submit");
   const authError = document.getElementById("chatbot-account-error");
   const authSuccess = document.getElementById("chatbot-account-success");
@@ -88,9 +89,10 @@
     authNameField.hidden = !signingUp;
     authName.required = signingUp;
     authPassword.autocomplete = signingUp ? "new-password" : "current-password";
+    forgotPassword.hidden = signingUp;
     authSubmit.innerHTML = signingUp
-      ? 'Create account <span class="arrow">→</span>'
-      : 'Log in <span class="arrow">→</span>';
+      ? 'Create account'
+      : 'Log in';
     authModeButtons.forEach((button) => {
       button.setAttribute(
         "aria-selected",
@@ -370,6 +372,39 @@
     });
   });
 
+  forgotPassword.addEventListener("click", async () => {
+    hideAuthMessages();
+    const email = authEmail.value.trim();
+    if (!email) {
+      showAuthError("Enter your email address first, then choose Forgot password.");
+      authEmail.focus();
+      return;
+    }
+    if (!authEmail.checkValidity()) {
+      authEmail.reportValidity();
+      return;
+    }
+
+    forgotPassword.disabled = true;
+    forgotPassword.textContent = "Sending reset link...";
+    try {
+      const { error } = await client.auth.resetPasswordForEmail(email, {
+        redirectTo: new URL("reset-password.html", window.location.href).href,
+      });
+      if (error) throw error;
+      authSuccess.textContent =
+        "Password reset email sent. Open the link in that email to choose a new password.";
+      authSuccess.hidden = false;
+    } catch (error) {
+      showAuthError(
+        error.message || "Could not send the password reset email. Please try again."
+      );
+    } finally {
+      forgotPassword.disabled = false;
+      forgotPassword.textContent = "Forgot password?";
+    }
+  });
+
   authForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     hideAuthMessages();
@@ -411,8 +446,8 @@
     } finally {
       authSubmit.disabled = false;
       authSubmit.innerHTML = state.authMode === "signup"
-        ? 'Create account <span class="arrow">→</span>'
-        : 'Log in <span class="arrow">→</span>';
+        ? 'Create account'
+        : 'Log in';
     }
   });
 

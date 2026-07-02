@@ -229,10 +229,55 @@ class ChatSessionSummary(BaseModel):
     status: str
     created_at: datetime
     updated_at: datetime
+    # Research Library metadata (optional so older clients are unaffected).
+    message_count: int = 0
+    preview: Optional[str] = None
+    report_id: Optional[int] = None
+    report_status: Optional[str] = None
+    source_count: int = 0
 
 
 class ChatSessionsResponse(BaseModel):
     sessions: List[ChatSessionSummary]
+
+
+class SessionRenameRequest(BaseModel):
+    title: str = Field(..., min_length=1, max_length=255)
+
+
+class SessionDeleteResponse(BaseModel):
+    status: str
+    session_id: int
+    deleted_messages: int
+    deleted_sources: int
+    deleted_reports: int
+
+
+class ResearchSourceItem(BaseModel):
+    source_id: int
+    source_type: str
+    url: str
+    scrape_status: str
+    extracted_summary: Optional[str] = None
+    error_message: Optional[str] = None
+    fetched_at: Optional[datetime] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class SessionSourcesResponse(BaseModel):
+    session_id: int
+    sources: List[ResearchSourceItem]
+
+
+class SessionReportResponse(BaseModel):
+    session_id: int
+    report_id: int
+    status: str
+    created_at: datetime
+    report_json: ResearchReportData
 
 
 class ChatReportResponse(BaseModel):

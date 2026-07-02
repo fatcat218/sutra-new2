@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=account-profile-20260627">
+<link rel="stylesheet" href="style.css?v=ui-review-20260702-final">
 </head>
 <body class="chatbot-page">
 
@@ -63,8 +63,10 @@
                autocomplete="current-password" required minlength="8"
                placeholder="At least 8 characters">
       </label>
+      <button class="auth-forgot-password" id="chatbot-forgot-password"
+              type="button">Forgot password?</button>
       <button class="btn btn-block" id="chatbot-account-submit" type="submit">
-        Log in <span class="arrow">→</span>
+        Log in
       </button>
       <p class="auth-page-error" id="chatbot-account-error" hidden></p>
       <p class="auth-page-success" id="chatbot-account-success" hidden></p>
@@ -98,6 +100,14 @@
         <button type="button" id="new-chat-button" aria-label="Start a new chat">＋</button>
       </div>
       <div class="chatbot-session-list" id="chatbot-session-list"></div>
+      <a class="chatbot-library-entry" href="research-library.html" id="chatbot-library-entry">
+        <span class="chatbot-library-icon" aria-hidden="true">▤</span>
+        <span class="chatbot-library-copy">
+          <b>Research Library</b>
+          <small>Manage all your saved research</small>
+        </span>
+        <span class="chatbot-profile-arrow">›</span>
+      </a>
       <a class="chatbot-profile-entry" href="profile.html" id="chatbot-profile-entry">
         <span class="chatbot-profile-avatar" data-profile-initials>U</span>
         <span class="chatbot-profile-copy">
@@ -125,7 +135,7 @@
         <textarea id="chatbot-input" rows="1"
                   placeholder="Describe your business, customers, or goal…"></textarea>
         <button class="btn" id="chatbot-send" type="submit" aria-label="Send message">
-          <span>Send</span><span class="arrow">↗</span>
+          <span>Send</span>
         </button>
       </form>
       <p class="chatbot-error" id="chatbot-error" hidden></p>
@@ -148,11 +158,11 @@
   <span class="dot-typing"></span><span class="dot-typing"></span><span class="dot-typing"></span>
 </div>
 
-<script src="main.js?v=claude-ui-20260621" defer></script>
+<script src="main.js?v=ui-review-20260702-final" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="supabase-config.js?v=supabase-20260627" defer></script>
 <script src="supabase-client.js?v=auth-flow-20260627" defer></script>
 <script src="auth-nav.js?v=auth-flow-20260627" defer></script>
-<script src="chatbot.js?v=account-profile-20260627" defer></script>
+<script src="chatbot.js?v=ui-review-20260702-final" defer></script>
 </body>
 </html>
