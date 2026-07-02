@@ -113,6 +113,7 @@ def generate_report(
         report_id=report.id,
         business_id=business.id,
         stage=session.stage,
+        created_at=report.created_at,
         report_json=report_data,
     )
 

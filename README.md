@@ -79,7 +79,12 @@ Then open:
 - Unauthenticated chatbot visits show login/sign-up on the chatbot page.
 - Login includes email-based password recovery and a dedicated reset page.
 - Conversations and message history can be resumed.
-- The backend generates and saves an estimated consumer research dashboard.
+- After the first useful answer, the chatbot exposes a visible **Build
+  dashboard** action instead of hiding it behind an internal chat stage.
+- Generated dashboards are grouped into executive, audience, market-signal,
+  and action-plan sections and are saved to the Research Library.
+- Reopening a completed conversation automatically restores its dashboard.
+- Dashboards can be refreshed from newer chat context or printed/saved as PDF.
 
 ## Research Library
 

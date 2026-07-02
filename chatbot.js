@@ -25,10 +25,14 @@
   const sendButton = document.getElementById("chatbot-send");
   const newChatButton = document.getElementById("new-chat-button");
   const reportButton = document.getElementById("chatbot-report-button");
+  const reportStatus = document.getElementById("chatbot-dashboard-status");
   const reportSection = document.getElementById("chatbot-report");
   const reportTitle = document.getElementById("chatbot-report-title");
+  const reportMeta = document.getElementById("chatbot-report-meta");
   const reportScore = document.getElementById("chatbot-score");
   const reportGrid = document.getElementById("chatbot-report-grid");
+  const reportRefresh = document.getElementById("chatbot-report-refresh");
+  const reportPrint = document.getElementById("chatbot-report-print");
   const errorEl = document.getElementById("chatbot-error");
 
   const state = {
@@ -38,6 +42,10 @@
     authMode: "login",
     initializing: false,
     workspaceUserId: null,
+    userMessageCount: 0,
+    reportAvailable: false,
+    reportLoaded: false,
+    reportCreatedAt: null,
   };
 
   function resetWorkspace() {
@@ -45,11 +53,19 @@
     state.stage = "intake";
     state.busy = false;
     state.workspaceUserId = null;
+    state.userMessageCount = 0;
+    state.reportAvailable = false;
+    state.reportLoaded = false;
+    state.reportCreatedAt = null;
     messages.replaceChildren();
     sessionList.replaceChildren();
     reportGrid.replaceChildren();
     reportSection.hidden = true;
-    reportButton.hidden = true;
+    reportButton.hidden = false;
+    reportButton.disabled = true;
+    reportButton.textContent = "Build dashboard";
+    reportStatus.textContent = "Describe your business to unlock the dashboard.";
+    reportRefresh.disabled = false;
     input.value = "";
     input.disabled = false;
     sendButton.disabled = false;
@@ -143,6 +159,7 @@
     input.disabled = busy;
     sendButton.disabled = busy;
     newChatButton.disabled = busy;
+    updateDashboardControls();
   }
 
   function addMessage(role, text) {
@@ -180,12 +197,45 @@
     document.getElementById("chatbot-typing")?.remove();
   }
 
-  function updateStage(stage) {
+  function updateDashboardControls() {
+    const hasSession = Boolean(state.sessionId);
+    const canGenerate = hasSession && state.userMessageCount > 0;
+    reportButton.hidden = !hasSession;
+    reportButton.disabled =
+      state.busy || (!state.reportAvailable && !canGenerate);
+    reportRefresh.disabled = state.busy || !state.reportAvailable;
+
+    if (state.busy) {
+      reportButton.textContent = state.reportAvailable
+        ? "Updating dashboard..."
+        : "Building dashboard...";
+      reportStatus.textContent =
+        "Analyzing your conversation and organizing the findings...";
+      return;
+    }
+    if (state.reportAvailable) {
+      reportButton.textContent = "View dashboard";
+      reportStatus.textContent = "Dashboard saved — open it whenever you need it.";
+      return;
+    }
+
+    reportButton.textContent = "Build dashboard";
+    if (!canGenerate) {
+      reportStatus.textContent = "Describe your business to unlock the dashboard.";
+    } else if (state.stage === "ready_for_report") {
+      reportStatus.textContent = "Sutra has enough context to build your dashboard.";
+    } else {
+      reportStatus.textContent =
+        "Build now, or keep answering for a sharper dashboard.";
+    }
+  }
+
+  function updateStage(stage, reportStatusValue) {
     state.stage = stage || state.stage;
-    reportButton.hidden = !["ready_for_report", "report_generated"].includes(state.stage);
-    reportButton.disabled = state.stage === "report_generated";
-    reportButton.textContent =
-      state.stage === "report_generated" ? "Dashboard generated" : "Generate dashboard";
+    state.reportAvailable =
+      reportStatusValue === "complete" ||
+      state.stage === "report_generated";
+    updateDashboardControls();
   }
 
   async function loadSessions() {
@@ -227,6 +277,10 @@
         body: JSON.stringify({ mode: "free", website_url: null }),
       });
       state.sessionId = data.session_id;
+      state.userMessageCount = 0;
+      state.reportAvailable = false;
+      state.reportLoaded = false;
+      state.reportCreatedAt = null;
       localStorage.setItem("sutra_active_session_id", String(state.sessionId));
       sessionTitle.textContent = "New research chat";
       updateStage(data.stage);
@@ -240,12 +294,20 @@
   async function openSession(session) {
     const data = await requestJson(`/api/chat/${session.session_id}/history`);
     state.sessionId = session.session_id;
+    state.userMessageCount = data.messages.filter(
+      (message) => message.role === "user"
+    ).length;
+    state.reportLoaded = false;
+    state.reportCreatedAt = null;
     localStorage.setItem("sutra_active_session_id", String(state.sessionId));
     sessionTitle.textContent = session.title || "Research chat";
     messages.replaceChildren();
     data.messages.forEach((message) => addMessage(message.role, message.content));
     reportSection.hidden = true;
-    updateStage(session.stage);
+    updateStage(session.stage, session.report_status);
+    if (state.reportAvailable) {
+      await loadExistingReport({ scroll: false });
+    }
     await loadSessions();
   }
 
@@ -267,6 +329,7 @@
       });
       removeTyping();
       addMessage("assistant", data.reply);
+      state.userMessageCount += 1;
       updateStage(data.stage);
       const sessions = await loadSessions();
       const current = sessions.find((item) => item.session_id === state.sessionId);
@@ -279,10 +342,11 @@
     }
   }
 
-  function appendReportCard(label, value) {
+  function appendReportCard(container, label, value, featured = false) {
     const values = Array.isArray(value) ? value.filter(Boolean) : value ? [value] : [];
     if (!values.length) return;
     const card = document.createElement("article");
+    if (featured) card.classList.add("is-featured");
     const heading = document.createElement("h3");
     heading.textContent = label;
     card.append(heading);
@@ -299,28 +363,144 @@
       });
       card.append(list);
     }
-    reportGrid.append(card);
+    container.append(card);
   }
 
-  function renderReport(report) {
+  function appendReportGroup(title, description, items) {
+    const group = document.createElement("section");
+    group.className = "chatbot-report-group";
+    const heading = document.createElement("div");
+    heading.className = "chatbot-report-group-head";
+    const label = document.createElement("h3");
+    label.textContent = title;
+    const copy = document.createElement("p");
+    copy.textContent = description;
+    heading.append(label, copy);
+
+    const cards = document.createElement("div");
+    cards.className = "chatbot-report-cards";
+    items.forEach(([itemLabel, value, featured]) => {
+      appendReportCard(cards, itemLabel, value, featured);
+    });
+    if (!cards.children.length) return;
+    group.append(heading, cards);
+    reportGrid.append(group);
+  }
+
+  function formatReportDate(value) {
+    const date = value ? new Date(value) : null;
+    if (!date || Number.isNaN(date.getTime())) {
+      return "Saved to your Research Library";
+    }
+    return `Generated ${date.toLocaleDateString(undefined, {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    })} · Saved to your Research Library`;
+  }
+
+  function renderReport(report, { createdAt = null, scroll = true } = {}) {
     reportTitle.textContent = report.dashboard_headline || "Your market intelligence";
     const score = Number(report.targeting_score);
     reportScore.textContent = Number.isFinite(score) ? `${Math.round(score)}/100` : "—";
+    state.reportCreatedAt = createdAt;
+    state.reportAvailable = true;
+    state.reportLoaded = true;
+    reportMeta.textContent = formatReportDate(createdAt);
     reportGrid.replaceChildren();
-    [
-      ["Targeting summary", report.targeting_effectiveness_summary],
-      ["Audience segments", report.key_audience_segments],
-      ["Market opportunity", report.market_opportunity_summary],
-      ["Recommendations", report.actionable_recommendations],
-      ["Engagement patterns", report.engagement_patterns],
-      ["Behavioural trends", report.behavioral_trends],
-      ["Pain points", report.pain_points],
-      ["Best channels", report.best_marketing_channels],
-      ["Campaign angles", report.campaign_angles],
-      ["Missing information", report.missing_information],
-    ].forEach(([label, value]) => appendReportCard(label, value));
+
+    appendReportGroup(
+      "Executive view",
+      "The clearest picture of the business, audience and immediate opportunity.",
+      [
+        ["Business summary", report.business_summary, true],
+        ["Target audience", report.target_audience_overview, true],
+        ["Targeting summary", report.targeting_effectiveness_summary],
+        ["Market opportunity", report.market_opportunity_summary],
+      ]
+    );
+    appendReportGroup(
+      "Audience intelligence",
+      "Who to prioritize and what shapes their buying decisions.",
+      [
+        ["Primary segment", report.primary_segment, true],
+        ["Secondary segment", report.secondary_segment],
+        ["Audience segments", report.key_audience_segments],
+        ["Age groups", report.age_groups],
+        ["Demographic analysis", report.demographic_analysis],
+        ["Socioeconomic analysis", report.socioeconomic_analysis],
+        ["Behavioural analysis", report.behavioral_analysis],
+        ["Buying motivations", report.buying_motivations],
+        ["Pain points", report.pain_points],
+      ]
+    );
+    appendReportGroup(
+      "Market signals",
+      "Patterns and opportunities that can influence positioning and timing.",
+      [
+        ["Engagement patterns", report.engagement_patterns],
+        ["Behavioural trends", report.behavioral_trends],
+        ["Market opportunities", report.market_opportunities],
+      ]
+    );
+    appendReportGroup(
+      "Action plan",
+      "Practical recommendations for messaging, channels and the next campaign.",
+      [
+        ["Recommendations", report.actionable_recommendations, true],
+        ["Best channels", report.best_marketing_channels],
+        ["Campaign angles", report.campaign_angles],
+        ["Missing information", report.missing_information],
+        ["Useful follow-up questions", report.recommended_follow_up_questions],
+      ]
+    );
+
     reportSection.hidden = false;
-    reportSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    updateDashboardControls();
+    if (scroll) {
+      reportSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
+  async function loadExistingReport({ scroll = true } = {}) {
+    if (!state.sessionId) return;
+    try {
+      const data = await requestJson(`/api/chat/${state.sessionId}/report`);
+      renderReport(data.report_json || {}, {
+        createdAt: data.created_at,
+        scroll,
+      });
+    } catch (error) {
+      state.reportAvailable = false;
+      state.reportLoaded = false;
+      updateDashboardControls();
+      throw error;
+    }
+  }
+
+  async function generateDashboard() {
+    if (state.busy || !state.sessionId || state.userMessageCount < 1) return;
+    hideError();
+    setBusy(true);
+    try {
+      const data = await requestJson(`/api/chat/${state.sessionId}/generate-report`, {
+        method: "POST",
+      });
+      updateStage(data.stage, "complete");
+      renderReport(data.report_json || {}, {
+        createdAt: data.created_at,
+        scroll: true,
+      });
+      addMessage(
+        "assistant",
+        "Your dashboard is ready and saved in your Research Library."
+      );
+      await loadSessions();
+    } catch (error) {
+      showError(error.message || "Could not build the dashboard.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function activateWorkspace(session) {
@@ -492,24 +672,24 @@
 
   reportButton.addEventListener("click", async () => {
     if (state.busy || !state.sessionId) return;
-    setBusy(true);
-    reportButton.disabled = true;
-    reportButton.textContent = "Generating...";
-    try {
-      const data = await requestJson(`/api/chat/${state.sessionId}/generate-report`, {
-        method: "POST",
-      });
-      updateStage(data.stage);
-      renderReport(data.report_json || {});
-      addMessage("assistant", "Your research dashboard is ready below.");
-    } catch (error) {
-      reportButton.disabled = false;
-      reportButton.textContent = "Generate dashboard";
-      showError(error.message || "Could not generate the dashboard.");
-    } finally {
-      setBusy(false);
+    if (state.reportAvailable) {
+      if (state.reportLoaded) {
+        reportSection.hidden = false;
+        reportSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else {
+        try {
+          await loadExistingReport();
+        } catch (error) {
+          showError(error.message || "Could not load the saved dashboard.");
+        }
+      }
+      return;
     }
+    await generateDashboard();
   });
+
+  reportRefresh.addEventListener("click", generateDashboard);
+  reportPrint.addEventListener("click", () => window.print());
 
   client?.auth.onAuthStateChange((event, session) => {
     if (event === "SIGNED_OUT" || !session) {

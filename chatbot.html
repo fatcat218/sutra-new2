@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=ui-review-20260702-final">
+<link rel="stylesheet" href="style.css?v=dashboard-20260702">
 </head>
 <body class="chatbot-page">
 
@@ -93,7 +93,7 @@
   <section class="chatbot-workspace wrap">
     <aside class="chatbot-sidebar">
       <div class="chatbot-sidebar-head">
-        <div>
+        <div class="chatbot-session-context">
           <span class="form-step">Saved conversations</span>
           <h2>Your research</h2>
         </div>
@@ -124,8 +124,13 @@
           <span class="chatbot-status-dot"></span>
           <span id="chatbot-session-title">New research chat</span>
         </div>
-        <button class="chatbot-report-button" id="chatbot-report-button"
-                type="button" hidden>Generate dashboard</button>
+        <div class="chatbot-dashboard-control">
+          <span id="chatbot-dashboard-status" role="status" aria-live="polite">
+            Describe your business to unlock the dashboard.
+          </span>
+          <button class="chatbot-report-button" id="chatbot-report-button"
+                  type="button" disabled>Build dashboard</button>
+        </div>
       </div>
 
       <div class="chatbot-messages" id="chatbot-messages" aria-live="polite"></div>
@@ -142,13 +147,26 @@
     </div>
   </section>
 
-  <section class="chatbot-report wrap" id="chatbot-report" hidden>
+  <section class="chatbot-report wrap" id="chatbot-report"
+           aria-labelledby="chatbot-report-title" hidden>
     <div class="chatbot-report-head">
       <div>
-        <div class="section-label">Generated research dashboard</div>
+        <div class="section-label">Your research dashboard</div>
         <h2 id="chatbot-report-title">Your market intelligence</h2>
+        <p class="chatbot-report-meta" id="chatbot-report-meta">
+          Built from your saved conversation
+        </p>
       </div>
-      <div class="chatbot-score" id="chatbot-score">—</div>
+      <div class="chatbot-report-summary">
+        <div class="chatbot-score">
+          <span>Targeting fit</span>
+          <strong id="chatbot-score">—</strong>
+        </div>
+        <div class="chatbot-report-actions">
+          <button type="button" id="chatbot-report-refresh">Refresh dashboard</button>
+          <button type="button" id="chatbot-report-print">Print / save PDF</button>
+        </div>
+      </div>
     </div>
     <div class="chatbot-report-grid" id="chatbot-report-grid"></div>
   </section>
@@ -163,6 +181,6 @@
 <script src="supabase-config.js?v=supabase-20260627" defer></script>
 <script src="supabase-client.js?v=auth-flow-20260627" defer></script>
 <script src="auth-nav.js?v=auth-flow-20260627" defer></script>
-<script src="chatbot.js?v=ui-review-20260702-final" defer></script>
+<script src="chatbot.js?v=dashboard-20260702" defer></script>
 </body>
 </html>
