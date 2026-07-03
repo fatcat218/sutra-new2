@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Creative Library — Sutra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=video-studio-20260703">
+</head>
+<body class="chatbot-page library-page">
+
+<canvas id="ring-grid" aria-hidden="true"></canvas>
+
+<nav>
+  <div class="wrap inner">
+    <a class="logo" href="index.html"><span>Sutra</span><span class="dot"></span></a>
+    <div class="nav-links">
+      <a href="chatbot.html">Chatbot</a>
+      <a href="research-library.html">Research Library</a>
+      <a href="video-studio.html">Video Studio</a>
+    </div>
+    <div class="chatbot-nav-account">
+      <span data-auth-user hidden></span>
+      <a class="btn auth-nav-btn" data-auth-action
+         data-auth-href="chatbot.html"
+         href="chatbot.html">Sign up / Log in</a>
+    </div>
+  </div>
+</nav>
+
+<main class="library-main wrap" id="creative-main" hidden>
+  <header class="chatbot-page-head">
+    <div>
+      <div class="section-label">Creative Library</div>
+      <h1>Every concept, <em>kept.</em></h1>
+    </div>
+    <p>
+      Campaign-video projects created in the Video Studio. Projects are stored
+      on this device until video persistence is connected to your account.
+    </p>
+  </header>
+
+  <section class="library-toolbar" aria-label="Creative Library actions">
+    <p class="creative-count" id="creative-count"></p>
+    <a class="btn" href="video-studio.html" id="creative-new">New video concept</a>
+  </section>
+
+  <div class="library-empty" id="creative-empty" hidden>
+    <div class="library-empty-mark" aria-hidden="true">▶</div>
+    <h2>No video projects yet</h2>
+    <p>
+      Open a research dashboard and choose “Create campaign video”, or start
+      from a blank brief in the Video Studio.
+    </p>
+    <a class="btn" href="video-studio.html">Open the Video Studio</a>
+  </div>
+
+  <section class="creative-grid" id="creative-grid" aria-live="polite"></section>
+</main>
+
+<div class="chatbot-auth-loading" id="creative-auth-loading">
+  <span class="dot-typing"></span><span class="dot-typing"></span><span class="dot-typing"></span>
+</div>
+
+<script src="main.js?v=ui-review-20260702-final" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="supabase-config.js?v=supabase-20260627" defer></script>
+<script src="supabase-client.js?v=auth-flow-20260627" defer></script>
+<script src="auth-nav.js?v=auth-flow-20260627" defer></script>
+<script src="video-store.js?v=video-studio-20260703" defer></script>
+<script src="creative-library.js?v=video-studio-20260703" defer></script>
+</body>
+</html>

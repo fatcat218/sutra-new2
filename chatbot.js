@@ -204,6 +204,8 @@
     reportButton.disabled =
       state.busy || (!state.reportAvailable && !canGenerate);
     reportRefresh.disabled = state.busy || !state.reportAvailable;
+    const videoButton = document.getElementById("chatbot-report-video");
+    if (videoButton) videoButton.disabled = state.busy || !state.reportAvailable;
 
     if (state.busy) {
       reportButton.textContent = state.reportAvailable
@@ -1020,6 +1022,24 @@
 
   reportRefresh.addEventListener("click", generateDashboard);
   reportPrint.addEventListener("click", () => window.print());
+
+  /* Campaign Video Studio entry point — hands the session context over. */
+  const reportVideo = document.getElementById("chatbot-report-video");
+  reportVideo?.addEventListener("click", () => {
+    if (!state.sessionId || !state.reportAvailable) return;
+    try {
+      localStorage.setItem(
+        "sutra_video_source",
+        JSON.stringify({
+          sessionId: state.sessionId,
+          title: sessionTitle.textContent || "",
+        })
+      );
+    } catch {
+      /* stash is best-effort; the studio re-fetches the report itself */
+    }
+    window.location.href = `video-studio.html?session=${state.sessionId}`;
+  });
 
   client?.auth.onAuthStateChange((event, session) => {
     if (event === "SIGNED_OUT" || !session) {
