@@ -287,5 +287,6 @@ class ChatReportResponse(BaseModel):
     report_id: int
     business_id: int
     stage: str
+    created_at: datetime
     # Reuses the existing structured report shape.
     report_json: ResearchReportData
