@@ -3450,6 +3450,77 @@
     cursor: default;
     opacity: .5;
   }
+  .chatbot-score-track {
+    display: block;
+    width: 130px;
+    height: 3px;
+    margin-top: 4px;
+    background: rgba(255,255,255,.22);
+    overflow: hidden;
+  }
+  .chatbot-score-track i {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: var(--paper-3);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform .7s cubic-bezier(.22, 1, .36, 1);
+  }
+  .chatbot-confidence {
+    border: 1px solid rgba(255,255,255,.4);
+    padding: 4px 9px;
+    color: var(--paper-3);
+    font: 500 10.5px/1 'Geist Mono', monospace;
+    letter-spacing: .05em;
+  }
+
+  /* Honest generation phases — no percentages */
+  .chatbot-dashboard-loading {
+    border: 1px solid var(--line-strong);
+    border-top: 0;
+    padding: 34px 30px;
+    background: var(--paper-2);
+  }
+  .dash-loading-phases {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 34px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .dash-loading-phases li {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--ink-mute);
+    font: 500 12px/1 'Geist Mono', monospace;
+    letter-spacing: .04em;
+    transition: color .4s ease;
+  }
+  .dash-loading-phases li::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border: 1.2px solid currentColor;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dash-loading-phases li.is-active {
+    color: var(--accent);
+  }
+  .dash-loading-phases li.is-active::before {
+    background: currentColor;
+  }
+  .dash-loading-phases li.is-done {
+    color: var(--ink-soft);
+  }
+  .dash-loading-phases li.is-done::before {
+    background: currentColor;
+  }
+
+  /* ── Dashboard body ── */
   .chatbot-report-grid {
     display: grid;
     border: 1px solid var(--line-strong);
@@ -3457,51 +3528,365 @@
     border-radius: 0 0 24px 24px;
     overflow: hidden;
     background: var(--paper-2);
+    transition: opacity .4s ease;
   }
-  .chatbot-report-group {
-    display: grid;
-    grid-template-columns: minmax(190px, .35fr) minmax(0, 1fr);
-    gap: 28px;
-    padding: 30px;
+  .chatbot-report-grid.is-updating {
+    opacity: .35;
+    pointer-events: none;
+  }
+  .dash-section {
+    padding: 34px 34px 40px;
     border-top: 1px solid var(--line);
   }
-  .chatbot-report-group:first-child { border-top: 0; }
-  .chatbot-report-group-head h3 {
-    margin-bottom: 8px;
-    font: 400 25px/1.1 'Instrument Serif', serif;
+  .dash-section:first-child { border-top: 0; }
+  .dash-section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 26px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line-strong);
   }
-  .chatbot-report-group-head p {
+  .dash-section-num {
+    font: 500 11px/1 'Geist Mono', monospace;
+    color: var(--accent);
+    letter-spacing: .08em;
+  }
+  .dash-section-head h3 {
+    font: 400 26px/1.05 'Instrument Serif', serif;
+    color: var(--ink);
+  }
+  .dash-section > * + *:not(.dash-section-head) { margin-top: 22px; }
+
+  .dash-label {
+    margin-bottom: 10px;
+    font: 600 10.5px/1.3 'Geist Mono', monospace;
+    letter-spacing: .09em;
+    text-transform: uppercase;
     color: var(--ink-mute);
-    font-size: 11.5px;
-    line-height: 1.55;
   }
-  .chatbot-report-cards {
+
+  /* Executive blocks */
+  .dash-lead {
+    max-width: 720px;
+    font: 400 clamp(19px, 2.2vw, 24px)/1.45 'Instrument Serif', serif;
+    color: var(--ink);
+  }
+  .dash-statement {
+    max-width: 720px;
+    border-left: 2px solid var(--accent);
+    padding: 4px 0 4px 18px;
+  }
+  .dash-statement p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+  .dash-note { max-width: 720px; }
+  .dash-note p {
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--ink-soft);
+  }
+
+  /* Audience */
+  .dash-segment-pair {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
   }
-  .chatbot-report-cards article {
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 18px;
-    background: rgba(255,255,255,.5);
+  .dash-segment {
+    border: 1px solid var(--line-strong);
+    background: var(--paper-3);
+    padding: 18px 20px;
   }
-  .chatbot-report-cards article.is-featured {
-    grid-column: 1 / -1;
-    border-color: var(--line-strong);
+  .dash-segment:first-child { border-left: 2px solid var(--accent); }
+  .dash-segment p {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  .dash-ranked-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0;
+  }
+  .dash-ranked-list li {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 11px 2px;
+    border-top: 1px solid var(--line);
+  }
+  .dash-ranked-list li:first-child { border-top: 0; }
+  .dash-rank-num {
+    font: 500 11px/1.5 'Geist Mono', monospace;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .dash-rank-text {
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  .dash-tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .dash-tag-row li {
+    border: 1px solid var(--line-strong);
+    padding: 6px 11px;
+    background: var(--paper-3);
+    font: 500 12px/1 'Geist', sans-serif;
+    color: var(--ink);
+  }
+  .dash-column-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 22px;
+  }
+  .dash-column h5 {
+    margin-bottom: 7px;
+    font: 400 16px/1.2 'Instrument Serif', serif;
+    color: var(--ink);
+  }
+  .dash-column p {
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: var(--ink-soft);
+  }
+
+  /* Motivations vs pain points */
+  .dash-compare {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 0;
+    border: 1px solid var(--line-strong);
     background: var(--paper-3);
   }
-  .chatbot-report-cards h3 {
-    margin-bottom: 10px;
-    font-size: 13px;
+  .dash-compare-side { padding: 20px 22px; }
+  .dash-compare-side + .dash-compare-side { border-left: 1px solid var(--line); }
+  .dash-compare-side ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 9px;
   }
-  .chatbot-report-cards p,
-  .chatbot-report-cards li {
+  .dash-compare-side li {
+    display: flex;
+    gap: 10px;
+    font-size: 13px;
+    line-height: 1.55;
     color: var(--ink-soft);
-    font-size: 13px;
-    line-height: 1.6;
   }
-  .chatbot-report-cards ul { display: grid; gap: 6px; padding-left: 17px; }
+  .dash-marker {
+    flex-shrink: 0;
+    width: 14px;
+    text-align: center;
+    font: 600 12px/1.6 'Geist Mono', monospace;
+    color: var(--accent);
+  }
+  .dash-compare-neg .dash-marker { color: var(--danger); }
+
+  /* Market lists */
+  .dash-split {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 26px;
+  }
+  .dash-list ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 9px;
+  }
+  .dash-list li {
+    display: flex;
+    gap: 10px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+
+  /* Channels ranking */
+  .dash-channel-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--line-strong);
+    background: var(--paper-3);
+  }
+  .dash-channel-list li {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 13px 20px;
+    border-top: 1px solid var(--line);
+  }
+  .dash-channel-list li:first-child { border-top: 0; }
+  .dash-channel-name {
+    flex: 1;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .dash-channel-list li:first-child .dash-channel-name { font-weight: 600; }
+  .dash-channel-tier {
+    font: 500 10px/1 'Geist Mono', monospace;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  /* Action plan */
+  .dash-plan-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0;
+    counter-reset: none;
+  }
+  .dash-plan-list li {
+    display: flex;
+    gap: 18px;
+    padding: 15px 2px;
+    border-top: 1px solid var(--line);
+  }
+  .dash-plan-list li:first-child { border-top: 0; }
+  .dash-plan-num {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--accent);
+    font: 500 11px/1 'Geist Mono', monospace;
+    color: var(--accent);
+  }
+  .dash-plan-list p {
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--ink);
+    align-self: center;
+  }
+
+  /* Campaign angle cards */
+  .dash-card-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 12px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .dash-card-row li {
+    border: 1px solid var(--line);
+    background: var(--paper-3);
+    padding: 15px 17px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  /* Understated warning panel */
+  .dash-warn {
+    border: 1px solid var(--line-strong);
+    border-left: 2px solid #9a7b2d;
+    background: rgba(154,123,45,.05);
+    padding: 20px 22px;
+  }
+  .dash-warn .dash-label { color: #7a6224; }
+  .dash-warn-group + .dash-warn-group { margin-top: 16px; }
+  .dash-warn-group h5 {
+    margin-bottom: 7px;
+    font: 600 12px/1.3 'Geist', sans-serif;
+    color: var(--ink);
+  }
+  .dash-warn-group ul {
+    margin: 0;
+    padding-left: 17px;
+    display: grid;
+    gap: 6px;
+  }
+  .dash-warn-group li {
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+
+  /* ── Reveal motion (one-shot, transform/opacity only) ── */
+  .dash-anim {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity .55s cubic-bezier(.22, 1, .36, 1),
+      transform .55s cubic-bezier(.22, 1, .36, 1);
+    transition-delay: calc(var(--db, 0) * 70ms);
+  }
+  .dash-anim.is-in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  /* Items inside a revealed block stagger in priority order */
+  .dash-ranked-list li,
+  .dash-channel-list li,
+  .dash-plan-list li,
+  .dash-tag-row li,
+  .dash-card-row li,
+  .dash-compare-side li,
+  .dash-list li,
+  .dash-column {
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity .45s cubic-bezier(.22, 1, .36, 1),
+      transform .45s cubic-bezier(.22, 1, .36, 1);
+    transition-delay: calc(var(--di, 0) * 60ms + 120ms);
+  }
+  .dash-anim.is-in .dash-ranked-list li,
+  .dash-anim.is-in .dash-channel-list li,
+  .dash-anim.is-in .dash-plan-list li,
+  .dash-anim.is-in .dash-tag-row li,
+  .dash-anim.is-in .dash-card-row li,
+  .dash-anim.is-in .dash-compare-side li,
+  .dash-anim.is-in .dash-list li,
+  .dash-anim.is-in .dash-column {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Keyboard focus on dashboard controls */
+  .chatbot-report-actions button:focus-visible,
+  .chatbot-report-button:focus-visible {
+    outline: 2px solid var(--paper-3);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dash-anim,
+    .dash-ranked-list li,
+    .dash-channel-list li,
+    .dash-plan-list li,
+    .dash-tag-row li,
+    .dash-card-row li,
+    .dash-compare-side li,
+    .dash-list li,
+    .dash-column {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+    .chatbot-score-track i { transition: none !important; }
+    .chatbot-report-grid { transition: none; }
+  }
 
   @media (max-width: 900px) {
     .chatbot-page-head { align-items: start; flex-direction: column; }
@@ -3512,7 +3897,6 @@
       max-height: 190px;
       overflow-y: auto;
     }
-    .chatbot-report-group { grid-template-columns: 1fr; }
   }
   @media (max-width: 680px) {
     .landing-chat-suggestions { align-items: stretch; flex-direction: column; }
@@ -3546,9 +3930,15 @@
     .chatbot-report-summary { justify-items: start; width: 100%; }
     .chatbot-score { justify-items: start; }
     .chatbot-report-actions { justify-content: flex-start; }
-    .chatbot-report-group { padding: 22px; }
-    .chatbot-report-cards { grid-template-columns: 1fr; }
-    .chatbot-report-cards article.is-featured { grid-column: auto; }
+    .dash-section { padding: 24px 18px 30px; }
+    .chatbot-dashboard-loading { padding: 24px 18px; }
+    .dash-loading-phases { flex-direction: column; gap: 10px; }
+    .dash-compare { grid-template-columns: 1fr; }
+    .dash-compare-side + .dash-compare-side {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+    .chatbot-score-track { width: 100%; max-width: 220px; }
   }
 
   @media print {
@@ -3575,9 +3965,27 @@
       break-inside: avoid;
       border-radius: 0;
     }
-    .chatbot-report-group,
-    .chatbot-report-cards article {
+    .dash-section,
+    .dash-segment,
+    .dash-compare,
+    .dash-channel-list,
+    .dash-plan-list li,
+    .dash-warn {
       break-inside: avoid;
+    }
+    .chatbot-dashboard-loading { display: none !important; }
+    .dash-anim,
+    .dash-ranked-list li,
+    .dash-channel-list li,
+    .dash-plan-list li,
+    .dash-tag-row li,
+    .dash-card-row li,
+    .dash-compare-side li,
+    .dash-list li,
+    .dash-column {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
     }
   }
 
